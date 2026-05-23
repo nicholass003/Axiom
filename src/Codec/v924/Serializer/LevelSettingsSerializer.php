@@ -10,7 +10,6 @@ use Nicholass003\Axiom\Codec\Common\Serializer\GameRulesSerializer;
 use Nicholass003\Axiom\Codec\Common\Serializer\LevelSettingsSerializer as BaseLevelSettingsSerializer;
 use Nicholass003\Axiom\Data\Type\Education\EducationUriResource;
 use Nicholass003\Axiom\Data\Type\LevelSettingsData;
-use Nicholass003\Axiom\Data\Type\SpawnSettings;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
@@ -160,31 +159,5 @@ class LevelSettingsSerializer extends BaseLevelSettingsSerializer{
 
         Byte::writeUnsigned($out, $d->chatRestrictionLevel);
         CodecHelper::writeBool($out, $d->disablePlayerInteractions);
-    }
-
-    private function readSpawnSettings(ByteBufferReader $in) : SpawnSettings{
-        return new SpawnSettings(
-            LE::readUnsignedShort($in),
-            CodecHelper::readString($in),
-            VarInt::readSignedInt($in)
-        );
-    }
-
-    private function writeSpawnSettings(ByteBufferWriter $out, SpawnSettings $s) : void{
-        LE::writeUnsignedShort($out, $s->biomeType);
-        CodecHelper::writeString($out, $s->biomeName);
-        VarInt::writeSignedInt($out, $s->dimension);
-    }
-
-    private function readEducationUri(ByteBufferReader $in) : EducationUriResource{
-        return new EducationUriResource(
-            CodecHelper::readString($in),
-            CodecHelper::readString($in)
-        );
-    }
-
-    private function writeEducationUri(ByteBufferWriter $out, EducationUriResource $uri) : void{
-        CodecHelper::writeString($out, $uri->buttonName);
-        CodecHelper::writeString($out, $uri->linkUri);
     }
 }

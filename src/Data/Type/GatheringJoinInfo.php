@@ -12,6 +12,8 @@ class GatheringJoinInfo{
 		public readonly string $experienceWorldId,
 		public readonly string $experienceWorldName,
 		public readonly string $creatorId,
-		public readonly string $storeId,
+		public readonly string $targetId,
+		public readonly string $scenarioId,
+		public readonly string $serverId
     ){}
 }

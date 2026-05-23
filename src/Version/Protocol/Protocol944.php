@@ -19,6 +19,7 @@ use Nicholass003\Axiom\Codec\v944\Serializer\Camera\Instruction\CameraFovInstruc
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\Instruction\CameraSplineInstructionSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Inventory\InventoryTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v944\ServerboundDataDrivenScreenClosedCodec;
+use Nicholass003\Axiom\Codec\v944\StartGameCodec;
 use Nicholass003\Axiom\Codec\v944\UpdateClientInputLocksCodec;
 use Nicholass003\Axiom\Codec\v944\VoxelShapesCodec;
 use Nicholass003\Axiom\Packet\BlockPickRequestPacket;
@@ -29,6 +30,7 @@ use Nicholass003\Axiom\Packet\LocatorBarPacket;
 use Nicholass003\Axiom\Packet\PartyChangedPacket;
 use Nicholass003\Axiom\Packet\ResourcePacksReadyForValidationPacket;
 use Nicholass003\Axiom\Packet\ServerboundDataDrivenScreenClosedPacket;
+use Nicholass003\Axiom\Packet\StartGamePacket;
 use Nicholass003\Axiom\Packet\UpdateClientInputLocksPacket;
 use Nicholass003\Axiom\Packet\VoxelShapesPacket;
 use Nicholass003\Axiom\Version\ProtocolVersion;
@@ -64,6 +66,7 @@ class Protocol944 implements ProtocolInterface{
             ->register(PartyChangedPacket::ID, new PartyChangedCodec())
             ->register(ServerboundDataDrivenScreenClosedPacket::ID, new ServerboundDataDrivenScreenClosedCodec())
             ->overrideCodecType(self::buildCodecType())
+            ->override(StartGamePacket::ID, new StartGameCodec())
             ->override(BlockPickRequestPacket::ID, new BlockPickRequestCodec())
             ->override(ClientboundDataDrivenUICloseScreenPacket::ID, new ClientboundDataDrivenUICloseScreenCodec())
             ->override(ClientboundDataDrivenUIShowScreenPacket::ID, new ClientboundDataDrivenUIShowScreenCodec())

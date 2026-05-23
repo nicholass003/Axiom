@@ -18,7 +18,6 @@ use Nicholass003\Axiom\Codec\v975\PlaySoundCodec;
 use Nicholass003\Axiom\Codec\v975\ServerboundDiagnosticsCodec;
 use Nicholass003\Axiom\Codec\v975\ServerPresenceInfoCodec;
 use Nicholass003\Axiom\Codec\v975\ServerStoreInfoCodec;
-use Nicholass003\Axiom\Codec\v975\StartGameCodec;
 use Nicholass003\Axiom\Codec\v975\UpdateClientOptionsCodec;
 use Nicholass003\Axiom\Packet\ActorEventPacket;
 use Nicholass003\Axiom\Packet\ClientMovementPredictionSyncPacket;
@@ -32,7 +31,6 @@ use Nicholass003\Axiom\Packet\PlaySoundPacket;
 use Nicholass003\Axiom\Packet\ServerboundDiagnosticsPacket;
 use Nicholass003\Axiom\Packet\ServerPresenceInfoPacket;
 use Nicholass003\Axiom\Packet\ServerStoreInfoPacket;
-use Nicholass003\Axiom\Packet\StartGamePacket;
 use Nicholass003\Axiom\Packet\UpdateClientOptionsPacket;
 use Nicholass003\Axiom\Version\ProtocolVersion;
 
@@ -57,7 +55,6 @@ class Protocol975 implements ProtocolInterface{
             ->override(PartyChangedPacket::ID, new PartyChangedCodec())
             ->override(PlaySoundPacket::ID, new PlaySoundCodec())
             ->override(ServerboundDiagnosticsPacket::ID, new ServerboundDiagnosticsCodec())
-            ->override(StartGamePacket::ID, new StartGameCodec())
             ->override(UpdateClientOptionsPacket::ID, new UpdateClientOptionsCodec());
     }
 }

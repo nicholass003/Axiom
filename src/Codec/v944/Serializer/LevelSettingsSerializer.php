@@ -2,35 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Nicholass003\Axiom\Codec\Common\Serializer;
+namespace Nicholass003\Axiom\Codec\v944\Serializer;
 
 use Nicholass003\Axiom\Codec\CodecHelper;
-use Nicholass003\Axiom\Codec\Support\CloneWithProperty;
-use Nicholass003\Axiom\Codec\Support\Forkable;
-use Nicholass003\Axiom\Codec\Support\ForkableInterface;
+use Nicholass003\Axiom\Codec\Common\Serializer\ExperimentsSerializer;
+use Nicholass003\Axiom\Codec\Common\Serializer\GameRulesSerializer;
+use Nicholass003\Axiom\Codec\v924\Serializer\LevelSettingsSerializer as V924LevelSettingsSerializer;
 use Nicholass003\Axiom\Data\Type\Education\EducationUriResource;
 use Nicholass003\Axiom\Data\Type\LevelSettingsData;
-use Nicholass003\Axiom\Data\Type\SpawnSettings;
 use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
-class LevelSettingsSerializer implements ForkableInterface{
-    use Forkable;
-    use CloneWithProperty;
+class LevelSettingsSerializer extends V924LevelSettingsSerializer{
 
     public function __construct(
-        private ExperimentsSerializer $experimentsSerializer,
-        private GameRulesSerializer $gameRulesSerializer
-    ){}
-
-    public function experiments() : ExperimentsSerializer{ return $this->experimentsSerializer; }
-    public function gameRules() : GameRulesSerializer{ return $this->gameRulesSerializer; }
-
-    public function withExperiments(ExperimentsSerializer $v) : self{ return $this->with('experimentsSerializer', $v); }
-    public function withGameRules(GameRulesSerializer $v) : self{ return $this->with('gameRulesSerializer', $v); }
+        ExperimentsSerializer $experimentsSerializer,
+        GameRulesSerializer $gameRulesSerializer
+    ){
+        parent::__construct($experimentsSerializer, $gameRulesSerializer);
+    }
 
     public function read(ByteBufferReader $in) : LevelSettingsData{
         return new LevelSettingsData(
@@ -40,7 +33,7 @@ class LevelSettingsSerializer implements ForkableInterface{
             VarInt::readSignedInt($in),
             CodecHelper::readBool($in),
             VarInt::readSignedInt($in),
-            CodecHelper::readBlockPosition($in),
+            CodecHelper::readSignedBlockPosition($in),
 
             CodecHelper::readBool($in),
             VarInt::readSignedInt($in),
@@ -64,8 +57,8 @@ class LevelSettingsSerializer implements ForkableInterface{
             CodecHelper::readBool($in),
             CodecHelper::readBool($in),
 
-            $this->gameRulesSerializer->read($in, true),
-            $this->experimentsSerializer->read($in),
+            $this->gameRules()->read($in, true),
+            $this->experiments()->read($in),
 
             CodecHelper::readBool($in),
             CodecHelper::readBool($in),
@@ -96,10 +89,10 @@ class LevelSettingsSerializer implements ForkableInterface{
             Byte::readUnsigned($in),
             CodecHelper::readBool($in),
 
-            CodecHelper::readString($in),
-            CodecHelper::readString($in),
-            CodecHelper::readString($in),
-            CodecHelper::readString($in)
+            '',
+            '',
+            '',
+            ''
         );
     }
 
@@ -111,7 +104,7 @@ class LevelSettingsSerializer implements ForkableInterface{
         VarInt::writeSignedInt($out, $d->worldGamemode);
         CodecHelper::writeBool($out, $d->hardcore);
         VarInt::writeSignedInt($out, $d->difficulty);
-        CodecHelper::writeBlockPosition($out, $d->spawnPosition);
+        CodecHelper::writeSignedBlockPosition($out, $d->spawnPosition);
 
         CodecHelper::writeBool($out, $d->hasAchievementsDisabled);
         VarInt::writeSignedInt($out, $d->editorWorldType);
@@ -135,8 +128,8 @@ class LevelSettingsSerializer implements ForkableInterface{
         CodecHelper::writeBool($out, $d->commandsEnabled);
         CodecHelper::writeBool($out, $d->isTexturePacksRequired);
 
-        $this->gameRulesSerializer->write($out, $d->gameRules, true);
-        $this->experimentsSerializer->write($out, $d->experiments);
+        $this->gameRules()->write($out, $d->gameRules, true);
+        $this->experiments()->write($out, $d->experiments);
 
         CodecHelper::writeBool($out, $d->hasBonusChestEnabled);
         CodecHelper::writeBool($out, $d->hasStartWithMapEnabled);
@@ -166,36 +159,5 @@ class LevelSettingsSerializer implements ForkableInterface{
 
         Byte::writeUnsigned($out, $d->chatRestrictionLevel);
         CodecHelper::writeBool($out, $d->disablePlayerInteractions);
-
-        CodecHelper::writeString($out, $d->serverIdentifier);
-        CodecHelper::writeString($out, $d->worldIdentifier);
-        CodecHelper::writeString($out, $d->scenarioIdentifier);
-        CodecHelper::writeString($out, $d->ownerIdentifier);
-    }
-
-    protected function readSpawnSettings(ByteBufferReader $in) : SpawnSettings{
-        return new SpawnSettings(
-            LE::readUnsignedShort($in),
-            CodecHelper::readString($in),
-            VarInt::readSignedInt($in)
-        );
-    }
-
-    protected function writeSpawnSettings(ByteBufferWriter $out, SpawnSettings $s) : void{
-        LE::writeUnsignedShort($out, $s->biomeType);
-        CodecHelper::writeString($out, $s->biomeName);
-        VarInt::writeSignedInt($out, $s->dimension);
-    }
-
-    protected function readEducationUri(ByteBufferReader $in) : EducationUriResource{
-        return new EducationUriResource(
-            CodecHelper::readString($in),
-            CodecHelper::readString($in)
-        );
-    }
-
-    protected function writeEducationUri(ByteBufferWriter $out, EducationUriResource $uri) : void{
-        CodecHelper::writeString($out, $uri->buttonName);
-        CodecHelper::writeString($out, $uri->linkUri);
     }
 }

@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Nicholass003\Axiom\Codec\v975;
+namespace Nicholass003\Axiom\Codec\v944;
 
+use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
-use Nicholass003\Axiom\Codec\v924\StartGameCodec as V924StartGameCodec;
 use Nicholass003\Axiom\Data\Type\ClientStoreEntrypointConfig;
+use Nicholass003\Axiom\Data\Type\GatheringJoinInfo;
 use Nicholass003\Axiom\Data\Type\PresenceConfig;
 use Nicholass003\Axiom\Data\Type\ServerJoinInformation;
 use Nicholass003\Axiom\Data\Type\ServerTelemetryData;
@@ -18,7 +19,7 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
-class StartGameCodec extends V924StartGameCodec{
+class StartGameCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : StartGamePacket{
         $pk = new StartGamePacket();
@@ -122,6 +123,53 @@ class StartGameCodec extends V924StartGameCodec{
         CodecHelper::writeOptional($out, $data->gatheringJoinInfo, $this->writeGatheringInfo(...));
         CodecHelper::writeOptional($out, $data->clientStoreEntrypointConfig, $this->writeClientStoreEntrypointConfig(...));
         CodecHelper::writeOptional($out, $data->presenceConfig, $this->writePresenceConfig(...));
+    }
+
+    protected function readServerTelementryData(ByteBufferReader $in) : ServerTelemetryData{
+        $serverId = CodecHelper::readString($in);
+        $scenarioId = CodecHelper::readString($in);
+        $worldId = CodecHelper::readString($in);
+        $ownerId = CodecHelper::readString($in);
+        return new ServerTelemetryData($serverId, $scenarioId, $worldId, $ownerId);
+    }
+
+    protected function writeServerTelementryData(ByteBufferWriter $out, ServerTelemetryData $data) : void{
+        CodecHelper::writeString($out, $data->serverId);
+        CodecHelper::writeString($out, $data->scenarioId);
+        CodecHelper::writeString($out, $data->worldId);
+        CodecHelper::writeString($out, $data->ownerId);
+    }
+
+    protected function readGatheringInfo(ByteBufferReader $in) : GatheringJoinInfo{
+        $experienceId = CodecHelper::readUuid($in);
+        $experienceName = CodecHelper::readString($in);
+        $experienceWorldId = CodecHelper::readUuid($in);
+        $experienceWorldName = CodecHelper::readString($in);
+        $creatorId = CodecHelper::readString($in);
+        $targetId = CodecHelper::readUuid($in);
+        $scenarioId = CodecHelper::readString($in);
+        $serverId = CodecHelper::readString($in);
+        return new GatheringJoinInfo(
+            $experienceId,
+            $experienceName,
+            $experienceWorldId,
+            $experienceWorldName,
+            $creatorId,
+            $targetId,
+            $scenarioId,
+            $serverId
+        );
+    }
+
+    protected function writeGatheringInfo(ByteBufferWriter $out, GatheringJoinInfo $data) : void{
+        CodecHelper::writeUuid($out, $data->experienceId);
+        CodecHelper::writeString($out, $data->experienceName);
+        CodecHelper::writeUuid($out, $data->experienceWorldId);
+        CodecHelper::writeString($out, $data->experienceWorldName);
+        CodecHelper::writeString($out, $data->creatorId);
+        CodecHelper::writeUuid($out, $data->targetId);
+        CodecHelper::writeString($out, $data->scenarioId);
+        CodecHelper::writeString($out, $data->serverId);
     }
 
     protected function readClientStoreEntrypointConfig(ByteBufferReader $in) : ClientStoreEntrypointConfig{
