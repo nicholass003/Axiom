@@ -45,16 +45,16 @@ class Protocol975 implements ProtocolInterface{
             ->register(ServerStoreInfoPacket::ID, new ServerStoreInfoCodec())
             ->register(ServerPresenceInfoPacket::ID, new ServerPresenceInfoCodec())
             ->overrideCodecType(self::buildCodecType())
-            ->override(ActorEventPacket::ID, new ActorEventCodec())
-            ->override(ClientMovementPredictionSyncPacket::ID, new ClientMovementPredictionSyncCodec())
-            ->override(CraftingDataPacket::ID, new CraftingDataCodec())
             ->override(DisconnectPacket::ID, new DisconnectCodec())
-            ->override(InventorySlotPacket::ID, new InventorySlotCodec())
-            ->override(LevelSoundEventPacket::ID, new LevelSoundEventCodec())
+            ->override(ActorEventPacket::ID, new ActorEventCodec())
             ->override(MobEquipmentPacket::ID, new MobEquipmentCodec())
-            ->override(PartyChangedPacket::ID, new PartyChangedCodec())
+            ->override(InventorySlotPacket::ID, new InventorySlotCodec())
+            ->override(CraftingDataPacket::ID, new CraftingDataCodec())
             ->override(PlaySoundPacket::ID, new PlaySoundCodec())
+            ->override(LevelSoundEventPacket::ID, new LevelSoundEventCodec())
             ->override(ServerboundDiagnosticsPacket::ID, new ServerboundDiagnosticsCodec())
-            ->override(UpdateClientOptionsPacket::ID, new UpdateClientOptionsCodec());
+            ->override(ClientMovementPredictionSyncPacket::ID, new ClientMovementPredictionSyncCodec())
+            ->override(UpdateClientOptionsPacket::ID, new UpdateClientOptionsCodec())
+            ->override(PartyChangedPacket::ID, new PartyChangedCodec());
     }
 }
