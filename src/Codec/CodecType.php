@@ -107,9 +107,14 @@ use Nicholass003\Axiom\Codec\Common\Serializer\SubChunkSerializer;
 use Nicholass003\Axiom\Codec\Common\Serializer\Trim\TrimMaterialSerializer;
 use Nicholass003\Axiom\Codec\Common\Serializer\Trim\TrimPatternSerializer;
 use Nicholass003\Axiom\Codec\Common\Serializer\TrimSerializer;
+use Nicholass003\Axiom\Codec\Support\CloneWithProperty;
+use Nicholass003\Axiom\Codec\Support\Forkable;
+use Nicholass003\Axiom\Codec\Support\ForkableInterface;
 use Nicholass003\Axiom\Enum\ItemStackRequestActionType;
 
-class CodecType{
+class CodecType implements ForkableInterface{
+    use Forkable;
+    use CloneWithProperty;
 
     public function __construct(
         private InventorySerializer $inventory,
@@ -140,65 +145,59 @@ class CodecType{
         private TrimSerializer $trim,
     ){}
 
-    public function inventory() : InventorySerializer { return $this->inventory; }
-    public function skin() : SkinSerializer { return $this->skin; }
-    public function levelSettings() : LevelSettingsSerializer { return $this->levelSettings; }
-    public function entityMetadata() : EntityMetadataSerializer { return $this->entityMetadata; }
-    public function recipe() : RecipeSerializer { return $this->recipe; }
-    public function attribute() : AttributeSerializer { return $this->attribute; }
-    public function experiments() : ExperimentsSerializer { return $this->experiments; }
-    public function gameRules() : GameRulesSerializer { return $this->gameRules; }
-    public function blockPalette() : BlockPaletteSerializer { return $this->blockPalette; }
-    public function propertySync() : PropertySyncSerializer { return $this->propertySync; }
-    public function blockAction() : PlayerBlockActionSerializer { return $this->blockAction; }
-    public function movementSettings() : PlayerMovementSettingsSerializer { return $this->movementSettings; }
-    public function networkPermissions() : NetworkPermissionsSerializer { return $this->networkPermissions; }
-    public function command() : CommandSerializer { return $this->command; }
-    public function biome() : BiomeSerializer { return $this->biome; }
-    public function cameraAimAssist() : CameraAimAssistSerializer { return $this->cameraAimAssist; }
-    public function cameraInstruction() : CameraInstructionSerializer { return $this->cameraInstruction; }
-    public function cameraPreset() : CameraPresetSerializer { return $this->cameraPreset; }
-    public function map() : MapSerializer { return $this->map; }
-    public function scoreboard() : ScoreboardSerializer { return $this->scoreboard; }
-    public function armor() : ArmorSerializer { return $this->armor; }
-    public function enchantment() : EnchantmentSerializer { return $this->enchantment; }
-    public function subChunk() : SubChunkSerializer { return $this->subChunk; }
-    public function structure() : StructureSerializer { return $this->structure; }
-    public function debug() : DebugSerializer { return $this->debug; }
-    public function trim() : TrimSerializer { return $this->trim; }
+    public function inventory() : InventorySerializer{ return $this->inventory; }
+    public function skin() : SkinSerializer{ return $this->skin; }
+    public function levelSettings() : LevelSettingsSerializer{ return $this->levelSettings; }
+    public function entityMetadata() : EntityMetadataSerializer{ return $this->entityMetadata; }
+    public function recipe() : RecipeSerializer{ return $this->recipe; }
+    public function attribute() : AttributeSerializer{ return $this->attribute; }
+    public function experiments() : ExperimentsSerializer{ return $this->experiments; }
+    public function gameRules() : GameRulesSerializer{ return $this->gameRules; }
+    public function blockPalette() : BlockPaletteSerializer{ return $this->blockPalette; }
+    public function propertySync() : PropertySyncSerializer{ return $this->propertySync; }
+    public function blockAction() : PlayerBlockActionSerializer{ return $this->blockAction; }
+    public function movementSettings() : PlayerMovementSettingsSerializer{ return $this->movementSettings; }
+    public function networkPermissions() : NetworkPermissionsSerializer{ return $this->networkPermissions; }
+    public function command() : CommandSerializer{ return $this->command; }
+    public function biome() : BiomeSerializer{ return $this->biome; }
+    public function cameraAimAssist() : CameraAimAssistSerializer{ return $this->cameraAimAssist; }
+    public function cameraInstruction() : CameraInstructionSerializer{ return $this->cameraInstruction; }
+    public function cameraPreset() : CameraPresetSerializer{ return $this->cameraPreset; }
+    public function map() : MapSerializer{ return $this->map; }
+    public function scoreboard() : ScoreboardSerializer{ return $this->scoreboard; }
+    public function armor() : ArmorSerializer{ return $this->armor; }
+    public function enchantment() : EnchantmentSerializer{ return $this->enchantment; }
+    public function subChunk() : SubChunkSerializer{ return $this->subChunk; }
+    public function structure() : StructureSerializer{ return $this->structure; }
+    public function debug() : DebugSerializer{ return $this->debug; }
+    public function trim() : TrimSerializer{ return $this->trim; }
 
-    protected function cloneWith(string $prop, object $value) : self{
-        $clone = clone $this;
-        $clone->$prop = $value;
-        return $clone;
-    }
-
-    public function withInventory(InventorySerializer $v) : self { return $this->cloneWith('inventory', $v); }
-    public function withSkin(SkinSerializer $v) : self { return $this->cloneWith('skin', $v); }
-    public function withLevelSettings(LevelSettingsSerializer $v) : self { return $this->cloneWith('levelSettings', $v); }
-    public function withEntityMetadata(EntityMetadataSerializer $v) : self { return $this->cloneWith('entityMetadata', $v); }
-    public function withRecipe(RecipeSerializer $v) : self { return $this->cloneWith('recipe', $v); }
-    public function withAttribute(AttributeSerializer $v) : self { return $this->cloneWith('attribute', $v); }
-    public function withExperiments(ExperimentsSerializer $v) : self { return $this->cloneWith('experiments', $v); }
-    public function withGameRules(GameRulesSerializer $v) : self { return $this->cloneWith('gameRules', $v); }
-    public function withBlockPalette(BlockPaletteSerializer $v) : self { return $this->cloneWith('blockPalette', $v); }
-    public function withPropertySync(PropertySyncSerializer $v) : self { return $this->cloneWith('propertySync', $v); }
-    public function withBlockAction(PlayerBlockActionSerializer $v) : self { return $this->cloneWith('blockAction', $v); }
-    public function withMovementSettings(PlayerMovementSettingsSerializer $v) : self { return $this->cloneWith('movementSettings', $v); }
-    public function withNetworkPermissions(NetworkPermissionsSerializer $v) : self { return $this->cloneWith('networkPermissions', $v); }
-    public function withCommand(CommandSerializer $v) : self { return $this->cloneWith('command', $v); }
-    public function withBiome(BiomeSerializer $v) : self { return $this->cloneWith('biome', $v); }
-    public function withCameraAimAssist(CameraAimAssistSerializer $v) : self { return $this->cloneWith('cameraAimAssist', $v); }
-    public function withCameraInstruction(CameraInstructionSerializer $v) : self { return $this->cloneWith('cameraInstruction', $v); }
-    public function withCameraPreset(CameraPresetSerializer $v) : self { return $this->cloneWith('cameraPreset', $v); }
-    public function withMap(MapSerializer $v) : self { return $this->cloneWith('map', $v); }
-    public function withScoreboard(ScoreboardSerializer $v) : self { return $this->cloneWith('scoreboard', $v); }
-    public function withArmor(ArmorSerializer $v) : self { return $this->cloneWith('armor', $v); }
-    public function withEnchantment(EnchantmentSerializer $v) : self { return $this->cloneWith('enchantment', $v); }
-    public function withSubChunk(SubChunkSerializer $v) : self { return $this->cloneWith('subChunk', $v); }
-    public function withStructure(StructureSerializer $v) : self { return $this->cloneWith('structure', $v); }
-    public function withDebug(DebugSerializer $v) : self { return $this->cloneWith('debug', $v); }
-    public function withTrim(TrimSerializer $v) : self { return $this->cloneWith('trim', $v); }
+    public function withInventory(InventorySerializer $v) : self{ return $this->with('inventory', $v); }
+    public function withSkin(SkinSerializer $v) : self{ return $this->with('skin', $v); }
+    public function withLevelSettings(LevelSettingsSerializer $v) : self{ return $this->with('levelSettings', $v); }
+    public function withEntityMetadata(EntityMetadataSerializer $v) : self{ return $this->with('entityMetadata', $v); }
+    public function withRecipe(RecipeSerializer $v) : self{ return $this->with('recipe', $v); }
+    public function withAttribute(AttributeSerializer $v) : self{ return $this->with('attribute', $v); }
+    public function withExperiments(ExperimentsSerializer $v) : self{ return $this->with('experiments', $v); }
+    public function withGameRules(GameRulesSerializer $v) : self{ return $this->with('gameRules', $v); }
+    public function withBlockPalette(BlockPaletteSerializer $v) : self{ return $this->with('blockPalette', $v); }
+    public function withPropertySync(PropertySyncSerializer $v) : self{ return $this->with('propertySync', $v); }
+    public function withBlockAction(PlayerBlockActionSerializer $v) : self{ return $this->with('blockAction', $v); }
+    public function withMovementSettings(PlayerMovementSettingsSerializer $v) : self{ return $this->with('movementSettings', $v); }
+    public function withNetworkPermissions(NetworkPermissionsSerializer $v) : self{ return $this->with('networkPermissions', $v); }
+    public function withCommand(CommandSerializer $v) : self{ return $this->with('command', $v); }
+    public function withBiome(BiomeSerializer $v) : self{ return $this->with('biome', $v); }
+    public function withCameraAimAssist(CameraAimAssistSerializer $v) : self{ return $this->with('cameraAimAssist', $v); }
+    public function withCameraInstruction(CameraInstructionSerializer $v) : self{ return $this->with('cameraInstruction', $v); }
+    public function withCameraPreset(CameraPresetSerializer $v) : self{ return $this->with('cameraPreset', $v); }
+    public function withMap(MapSerializer $v) : self{ return $this->with('map', $v); }
+    public function withScoreboard(ScoreboardSerializer $v) : self{ return $this->with('scoreboard', $v); }
+    public function withArmor(ArmorSerializer $v) : self{ return $this->with('armor', $v); }
+    public function withEnchantment(EnchantmentSerializer $v) : self{ return $this->with('enchantment', $v); }
+    public function withSubChunk(SubChunkSerializer $v) : self{ return $this->with('subChunk', $v); }
+    public function withStructure(StructureSerializer $v) : self{ return $this->with('structure', $v); }
+    public function withDebug(DebugSerializer $v) : self{ return $this->with('debug', $v); }
+    public function withTrim(TrimSerializer $v) : self{ return $this->with('trim', $v); }
 
     public static function createDefault() : self{
         $actionsRegistry = new ItemStackRequestActionsSerializer();
@@ -384,37 +383,6 @@ class CodecType{
             $structure,
             $debug,
             $trim
-        );
-    }
-
-    public function fork() : self{
-        return new self(
-            $this->inventory->fork(),
-            $this->skin->fork(),
-            $this->levelSettings->fork(),
-            $this->entityMetadata->fork(),
-            $this->recipe->fork(),
-            $this->attribute->fork(),
-            $this->experiments->fork(),
-            $this->gameRules->fork(),
-            $this->blockPalette->fork(),
-            $this->propertySync->fork(),
-            $this->blockAction->fork(),
-            $this->movementSettings->fork(),
-            $this->networkPermissions->fork(),
-            $this->command->fork(),
-            $this->biome->fork(),
-            $this->cameraAimAssist->fork(),
-            $this->cameraInstruction->fork(),
-            $this->cameraPreset->fork(),
-            $this->map->fork(),
-            $this->scoreboard->fork(),
-            $this->armor->fork(),
-            $this->enchantment->fork(),
-            $this->subChunk->fork(),
-            $this->structure->fork(),
-            $this->debug->fork(),
-            $this->trim->fork(),
         );
     }
 }
