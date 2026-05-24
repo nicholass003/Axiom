@@ -30,8 +30,8 @@ class AddPlayerCodec implements Codec{
         $pk->headYaw = LE::readFloat($in);
         $pk->item = CodecHelper::readItemStackWrapper($in);
         $pk->gameMode = VarInt::readSignedInt($in);
-        $pk->metadata = $codec->entityMetadata->read($in);
-        $pk->syncedProperties = $codec->propertySync->read($in);
+        $pk->metadata = $codec->entityMetadata()->read($in);
+        $pk->syncedProperties = $codec->propertySync()->read($in);
 
         $abilitiesPk = new UpdateAbilitiesPacket();
         $pk->abilitiesPacket = $abilitiesPk;
@@ -59,8 +59,8 @@ class AddPlayerCodec implements Codec{
         LE::writeFloat($out, $pk->headYaw);
         CodecHelper::writeItemStackWrapper($out, $pk->item);
         VarInt::writeSignedInt($out, $pk->gameMode);
-        $codec->entityMetadata->write($out, $pk->metadata);
-        $codec->propertySync->write($out, $pk->syncedProperties);
+        $codec->entityMetadata()->write($out, $pk->metadata);
+        $codec->propertySync()->write($out, $pk->syncedProperties);
         VarInt::writeUnsignedInt($out, count($pk->links));
         foreach($pk->links as $link){
             CodecHelper::writeEntityLink($out, $link);
