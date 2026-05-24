@@ -80,7 +80,7 @@ class Protocol944 implements ProtocolInterface{
             $codecType->inventory()->response(),
             $codecType->inventory()->container(),
             $codecType->inventory()->action(),
-            new InventoryTransactionDataSerializer($codecType->inventory()->transaction()->action()),
+            new InventoryTransactionDataSerializer($codecType->inventory()->action()),
             $codecType->inventory()->itemInteraction()
         );
         $levelSettings = new LevelSettingsSerializer(
