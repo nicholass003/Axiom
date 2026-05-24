@@ -27,6 +27,7 @@ use Nicholass003\Axiom\Codec\v944\ResourcePacksReadyForValidationCodec;
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\Instruction\CameraFovInstructionSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\Instruction\CameraSplineInstructionSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Inventory\InventoryTransactionDataSerializer;
+use Nicholass003\Axiom\Codec\v944\Serializer\LevelSettingsSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\SubChunk\UpdateSubChunkBlocksPacketEntrySerializer;
 use Nicholass003\Axiom\Codec\v944\ServerboundDataDrivenScreenClosedCodec;
 use Nicholass003\Axiom\Codec\v944\SetSpawnPositionCodec;
@@ -82,6 +83,10 @@ class Protocol944 implements ProtocolInterface{
             new InventoryTransactionDataSerializer($codecType->inventory()->transaction()->action()),
             $codecType->inventory()->itemInteraction()
         );
+        $levelSettings = new LevelSettingsSerializer(
+            $codecType->levelSettings()->experiments(),
+            $codecType->gameRules()
+        );
         $subChunk = new SubChunkSerializer(
             $codecType->subChunk()->heightMap(),
             $codecType->subChunk()->entryCommon(),
@@ -90,6 +95,7 @@ class Protocol944 implements ProtocolInterface{
         return $codecType
             ->withCameraInstruction($cameraInstruction)
             ->withInventory($inventory)
+            ->withLevelSettings($levelSettings)
             ->withSubChunk($subChunk);
     }
 
