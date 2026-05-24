@@ -16,6 +16,7 @@ class MobArmorEquipmentCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : MobArmorEquipmentPacket{
         $pk = new MobArmorEquipmentPacket();
+        $pk->actorRuntimeId = CodecHelper::readActorRuntimeId($in);
         $pk->head = CodecHelper::readItemStackWrapper($in);
         $pk->chest = CodecHelper::readItemStackWrapper($in);
         $pk->legs = CodecHelper::readItemStackWrapper($in);
@@ -26,6 +27,7 @@ class MobArmorEquipmentCodec implements Codec{
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof MobArmorEquipmentPacket);
+        CodecHelper::writeActorRuntimeId($out, $pk->actorRuntimeId);
         CodecHelper::writeItemStackWrapper($out, $pk->head);
         CodecHelper::writeItemStackWrapper($out, $pk->chest);
         CodecHelper::writeItemStackWrapper($out, $pk->legs);

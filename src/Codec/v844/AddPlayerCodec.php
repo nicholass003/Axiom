@@ -9,7 +9,6 @@ use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Packet\AddPlayerPacket;
 use Nicholass003\Axiom\Packet\Packet;
-use Nicholass003\Axiom\Packet\UpdateAbilitiesPacket;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
@@ -33,8 +32,8 @@ class AddPlayerCodec implements Codec{
         $pk->metadata = $codec->entityMetadata()->read($in);
         $pk->syncedProperties = $codec->propertySync()->read($in);
 
-        $abilitiesPk = new UpdateAbilitiesPacket();
-        $pk->abilitiesPacket = $abilitiesPk;
+        $abilitiesCodec = new UpdateAbilitiesCodec();
+        $pk->abilitiesPacket = $abilitiesCodec->decode($in, $codec);
 
         $linkCount = VarInt::readUnsignedInt($in);
         for($i = 0; $i < $linkCount; ++$i){
@@ -61,10 +60,15 @@ class AddPlayerCodec implements Codec{
         VarInt::writeSignedInt($out, $pk->gameMode);
         $codec->entityMetadata()->write($out, $pk->metadata);
         $codec->propertySync()->write($out, $pk->syncedProperties);
+
+        $abilitiesCodec = new UpdateAbilitiesCodec();
+        $abilitiesCodec->encode($out, $pk->abilitiesPacket, $codec);
+
         VarInt::writeUnsignedInt($out, count($pk->links));
         foreach($pk->links as $link){
             CodecHelper::writeEntityLink($out, $link);
         }
+
         CodecHelper::writeString($out, $pk->deviceId);
         LE::writeSignedInt($out, $pk->buildPlatform);
     }
