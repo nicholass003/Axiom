@@ -80,6 +80,6 @@ class TextCodec implements Codec{
         }
         CodecHelper::writeString($out, $pk->xboxUserId);
         CodecHelper::writeString($out, $pk->platformChatId);
-        CodecHelper::writeString($out, $pk->filteredMessage);
+        CodecHelper::writeString($out, $pk->filteredMessage ?? '');
     }
 }
