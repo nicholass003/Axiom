@@ -7,7 +7,6 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
-use Nicholass003\Axiom\Data\Type\LevelChunkData;
 use Nicholass003\Axiom\Packet\LevelChunkPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
@@ -23,7 +22,9 @@ class LevelChunkCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : LevelChunkPacket{
         $pk = new LevelChunkPacket();
         $position = CodecHelper::readChunkPosition($in);
+        $pk->position = $position;
         $dimensionId = VarInt::readSignedInt($in);
+        $pk->dimensionId = $dimensionId;
         $rawCount = VarInt::readUnsignedInt($in);
         $clientRequests = false;
         $subChunkCount = $rawCount;
@@ -36,6 +37,8 @@ class LevelChunkCodec implements Codec{
             $clientRequests = true;
             $subChunkCount = LE::readUnsignedShort($in);
         }
+        $pk->subChunkCount = $subChunkCount;
+        $pk->clientSubChunkRequestsEnabled = $clientRequests;
 
         $usedBlobHashes = null;
 
@@ -52,47 +55,39 @@ class LevelChunkCodec implements Codec{
                 $usedBlobHashes[] = LE::readUnsignedLong($in);
             }
         }
+        $pk->usedBlobHashes = $usedBlobHashes;
 
         $payload = CodecHelper::readString($in);
-        $pk->data = new LevelChunkData(
-            $position,
-            $dimensionId,
-            $subChunkCount,
-            $clientRequests,
-            $usedBlobHashes,
-            $payload
-        );
-
+        $pk->payload = $payload;
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof LevelChunkPacket);
-        $d = $pk->data;
-        CodecHelper::writeChunkPosition($out, $d->position);
-        VarInt::writeSignedInt($out, $d->dimensionId);
+        CodecHelper::writeChunkPosition($out, $pk->position);
+        VarInt::writeSignedInt($out, $pk->dimensionId);
 
-        if($d->clientSubChunkRequestsEnabled){
-            if($d->subChunkCount === PHP_INT_MAX){
+        if($pk->clientSubChunkRequestsEnabled){
+            if($pk->subChunkCount === PHP_INT_MAX){
                 VarInt::writeUnsignedInt($out, self::CLIENT_REQUEST_FULL_COLUMN_FAKE_COUNT);
             }else{
                 VarInt::writeUnsignedInt($out, self::CLIENT_REQUEST_TRUNCATED_COLUMN_FAKE_COUNT);
-                LE::writeUnsignedShort($out, $d->subChunkCount);
+                LE::writeUnsignedShort($out, $pk->subChunkCount);
             }
         }else{
-            VarInt::writeUnsignedInt($out, $d->subChunkCount);
+            VarInt::writeUnsignedInt($out, $pk->subChunkCount);
         }
 
-        CodecHelper::writeBool($out, $d->usedBlobHashes !== null);
+        CodecHelper::writeBool($out, $pk->usedBlobHashes !== null);
 
-        if($d->usedBlobHashes !== null){
-            VarInt::writeUnsignedInt($out, count($d->usedBlobHashes));
+        if($pk->usedBlobHashes !== null){
+            VarInt::writeUnsignedInt($out, count($pk->usedBlobHashes));
 
-            foreach($d->usedBlobHashes as $hash){
+            foreach($pk->usedBlobHashes as $hash){
                 LE::writeUnsignedLong($out, $hash);
             }
         }
 
-        CodecHelper::writeString($out, $d->payload);
+        CodecHelper::writeString($out, $pk->payload);
     }
 }
