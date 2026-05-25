@@ -150,6 +150,6 @@ class StartGameCodec implements Codec{
         CodecHelper::writeString($out, $data->experienceWorldId);
         CodecHelper::writeString($out, $data->experienceWorldName);
         CodecHelper::writeString($out, $data->creatorId);
-        CodecHelper::writeString($out, $data->storeId);
+        CodecHelper::writeString($out, $data->targetId);
     }
 }
