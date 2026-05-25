@@ -6,14 +6,25 @@ namespace Nicholass003\Axiom\Data\Type;
 
 class GatheringJoinInfo{
 
+    /** @since v975 */
+	public readonly string $targetId;
+    /** @since v975 */
+	public readonly string $scenarioId;
+    /** @since v975 */
+	public readonly string $serverId;
+
     public function __construct(
 		public readonly string $experienceId,
 		public readonly string $experienceName,
 		public readonly string $experienceWorldId,
 		public readonly string $experienceWorldName,
 		public readonly string $creatorId,
-		public readonly string $targetId,
-		public readonly string $scenarioId,
-		public readonly string $serverId
-    ){}
+		string $targetId = '',
+		string $scenarioId = '',
+		string $serverId = ''
+    ){
+		$this->targetId = $targetId;
+		$this->scenarioId = $scenarioId;
+		$this->serverId = $serverId;
+	}
 }
