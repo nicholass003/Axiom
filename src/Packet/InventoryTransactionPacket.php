@@ -16,5 +16,9 @@ class InventoryTransactionPacket implements Packet{
     public int $requestId;
     /** @var list<InventoryTransactionChangedSlotsHack> */
     public array $requestChangedSlots = [];
+    /** @since v1001 */
+    public bool $hasLegacySetSlots = false;
+    /** @since v1001 */
+    public bool $hasTransactionData = false;
     public TransactionData $trData;
 }

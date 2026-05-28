@@ -44,6 +44,8 @@ class StartGamePacket implements Packet{
     public bool $blockNetworkIdsAreHashes;
     /** @deprecated v898 */
     public bool $enableTickDeathSystems = false;
+    /** @since v1001 */
+    public bool $isLoggingChat = false;
     public NetworkPermissionsData $networkPermissions;
 
     /** @since v924 */

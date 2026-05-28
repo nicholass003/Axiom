@@ -8,6 +8,7 @@ enum InventoryActionSourceType : int{
 
     case UNKNOWN = -1;
     case CONTAINER = 0;
+    case GLOBAL = 1;
     case WORLD = 2;
     case CREATIVE = 3;
     case TODO = 99999;

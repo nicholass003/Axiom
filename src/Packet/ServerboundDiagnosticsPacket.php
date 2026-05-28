@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Data\PacketRecipient;
 use Nicholass003\Axiom\Data\Type\EntityDiagnosticTimingInfo;
 use Nicholass003\Axiom\Data\Type\MemoryCategoryCounter;
 use Nicholass003\Axiom\Data\Type\SystemDiagnosticTimingInfo;
+use Nicholass003\Axiom\Data\Type\WhiskerScopeDataSummary;
 
 class ServerboundDiagnosticsPacket implements Packet{
 
@@ -39,5 +40,10 @@ class ServerboundDiagnosticsPacket implements Packet{
      * @var list<SystemDiagnosticTimingInfo>
      */
     public array $systemDiagnostics = [];
+    /** 
+     * @since v1001
+     * @var list<WhiskerScopeDataSummary>
+     */
+    public array $whiskerScopes = [];
 
 }

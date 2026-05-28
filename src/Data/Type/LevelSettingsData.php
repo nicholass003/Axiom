@@ -16,6 +16,10 @@ class LevelSettingsData{
     public readonly string $scenarioIdentifier;
     /** @deprecated v924 */
     public readonly string $ownerIdentifier;
+    /** @since v1001 */
+    public readonly int $serverEditorConnectionPolicy;
+    /** @since v1001 */
+    public readonly bool $allowAnonymousBlockDropsInEditorWorlds;
 
     /**
      * @param array<string, mixed> $gameRules
@@ -72,11 +76,15 @@ class LevelSettingsData{
         string $serverIdentifier = '',
         string $worldIdentifier = '',
         string $scenarioIdentifier = '',
-        string $ownerIdentifier = ''
+        string $ownerIdentifier = '',
+        int $serverEditorConnectionPolicy = 0,
+        bool $allowAnonymousBlockDropsInEditorWorlds = false
     ){
         $this->serverIdentifier = $serverIdentifier;
         $this->worldIdentifier = $worldIdentifier;
         $this->scenarioIdentifier = $scenarioIdentifier;
         $this->ownerIdentifier = $ownerIdentifier;
+        $this->serverEditorConnectionPolicy = $serverEditorConnectionPolicy;
+        $this->allowAnonymousBlockDropsInEditorWorlds = $allowAnonymousBlockDropsInEditorWorlds;
     }
 }

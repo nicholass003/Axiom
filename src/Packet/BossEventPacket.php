@@ -19,6 +19,7 @@ class BossEventPacket implements Packet{
     public float $healthPercent;
     public string $title;
     public string $filteredTitle;
+    /** @deprecated v1001 */
     public bool $darkenScreen;
     public int $color;
     public int $overlay;

@@ -577,7 +577,50 @@ enum LevelSoundType : int{
 	case PAUSE_GROWTH = 597;
 	case RESET_GROWTH = 598;
 
+    /** @since v1001 */
+	case SLIME_LANDING = 601;
+    /** @since v1001 */
+	case ABSORB_BLOCK = 602;
+    /** @since v1001 */
+	case EJECT_BLOCK = 603;
+    /** @since v1001 */
+	case GEYSER_ERUPTION_START = 604;
+    /** @since v1001 */
+	case GEYSER_ERUPTION_ACTIVE = 605;
+    /** @since v1001 */
+	case RECORD_BOUNCE = 606;
+    /** @since v1001 */
+	case BUCKET_FILL_LAND_ANIMAL = 607;
+    /** @since v1001 */
+	case BUCKET_EMPTY_LAND_ANIMAL = 608;
+    /** @since v1001 */
+	case GEYSER_CONTINUOUS_ERUPTION_START = 609;
+    /** @since v1001 */
+	case GEYSER_CONTINUOUS_ERUPTION_ACTIVE = 610;
+
     public static function safe(int $value) : self{
         return self::tryFrom($value) ?? self::UNKNOWN;
+    }
+
+    /**
+     * @return static|null
+     */
+    public static function tryFromName(string $name) : ?self{
+        static $cache = [];
+
+        return $cache[$name] ??= self::tryResolve($name);
+    }
+
+    /**
+     * @return static|null
+     */
+    private static function tryResolve(string $name) : ?self{
+        foreach(self::cases() as $case){
+            if($case->name === $name){
+                return $case;
+            }
+        }
+
+        return null;
     }
 }

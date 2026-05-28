@@ -22,6 +22,8 @@ class GraphicsOverrideParameterPacket implements Packet{
     /** @since v924 */
     public ?Vec3 $unknownVec3 = null;
     public string $biomeIdentifier;
+    /** @since v1001 */
+    public string $playerIdentifier = '';
     public GraphicsOverrideParameterType $parameterType;
     public bool $reset;
 }

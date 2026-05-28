@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom;
 
 use Nicholass003\Axiom\Codec\CodecBuilder;
+use Nicholass003\Axiom\Version\Protocol\Protocol1001;
 use Nicholass003\Axiom\Version\Protocol\Protocol844;
 use Nicholass003\Axiom\Version\Protocol\Protocol859;
 use Nicholass003\Axiom\Version\Protocol\Protocol860;
@@ -34,6 +35,7 @@ class Axiom{
             ProtocolVersion::v924 => Protocol924::build(),
             ProtocolVersion::v944 => Protocol944::build(),
             ProtocolVersion::v975 => Protocol975::build(),
+            ProtocolVersion::v1001 => Protocol1001::build(),
             default => throw new \InvalidArgumentException("Protocol $protocol not yet implemented in Axiom"),
         };
         return self::$cache[$protocol] = $builder;

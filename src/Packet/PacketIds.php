@@ -234,4 +234,7 @@ class PacketIds{
     public const CLIENTBOUND_ATTRIBUTE_LAYER_SYNC = 345;
     public const SERVER_STORE_INFO = 346;
     public const SERVER_PRESENCE_INFO = 347;
+    public const CLIENTBOUND_UPDATE_SOUND_DATA = 348;
+    public const SEND_PARTY_DESTINATION_COOKIE = 349;
+    public const PARTY_DESTINATION_COOKIE_RESPONSE = 350;
 }
