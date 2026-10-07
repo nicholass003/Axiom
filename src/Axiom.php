@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Codec\CodecBuilder;
 use Nicholass003\Axiom\Version\MinecraftVersionNetwork;
 use Nicholass003\Axiom\Version\Protocol\Protocol1001;
 use Nicholass003\Axiom\Version\Protocol\Protocol2168;
+use Nicholass003\Axiom\Version\Protocol\Protocol2193;
 use Nicholass003\Axiom\Version\Protocol\Protocol844;
 use Nicholass003\Axiom\Version\Protocol\Protocol859;
 use Nicholass003\Axiom\Version\Protocol\Protocol860;
@@ -41,6 +42,7 @@ class Axiom{
             ProtocolVersion::v975 => Protocol975::build($mc),
             ProtocolVersion::v1001 => Protocol1001::build($mc),
             ProtocolVersion::v2168 => Protocol2168::build($mc),
+            ProtocolVersion::v2193 => Protocol2193::build($mc),
             default => throw new \InvalidArgumentException("Protocol $protocol not yet implemented in Axiom"),
         };
         return self::$cache[$key] = $builder;
