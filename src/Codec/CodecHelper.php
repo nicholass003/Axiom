@@ -22,11 +22,11 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
-    use pocketmine\utils\Binary;
-    use function count;
-    use function strlen;
-    use function strrev;
-    use function substr;
+use pocketmine\utils\Binary;
+use function count;
+use function strlen;
+use function strrev;
+use function substr;
 
 class CodecHelper{
 

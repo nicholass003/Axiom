@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v2168;
 
 use Nicholass003\Axiom\Codec\Codec;
-use Nicholass003\Axiom\Codec\CodecCommon\BitSet;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Codec\Common\BitSet;
 use Nicholass003\Axiom\Data\Type\Inventory\StackRequest\ItemStackRequest;
 use Nicholass003\Axiom\Data\Type\ItemInteractionData;
 use Nicholass003\Axiom\Data\Type\PlayerAuthInputData;
@@ -59,7 +59,7 @@ class PlayerAuthInputCodec implements Codec{
         if($vehicleRotation !== null && $vehicleActorUniqueId !== null){
             $vehicleInfo = new PlayerAuthInputVehicleInfo(
                 $vehicleRotation->x,
-                $vehicleRotation->z,
+                $vehicleRotation->y,
                 $vehicleActorUniqueId
             );
         }elseif($vehicleRotation === null && $vehicleActorUniqueId === null){
