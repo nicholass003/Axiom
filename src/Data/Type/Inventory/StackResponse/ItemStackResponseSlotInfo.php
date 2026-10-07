@@ -10,9 +10,9 @@ class ItemStackResponseSlotInfo{
         public readonly int $slot,
         public readonly int $hotbarSlot,
         public readonly int $count,
-        public readonly int $itemStackId,
+        public readonly ?int $itemStackId,
         public readonly string $customName,
-        public readonly string $filteredCustomName,
+        public readonly ?string $filteredCustomName,
         public readonly int $durabilityCorrection
     ){}
 }

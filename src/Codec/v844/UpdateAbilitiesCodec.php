@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v844;
 
 use Nicholass003\Axiom\Codec\Codec;
+use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\AbilitiesData;
 use Nicholass003\Axiom\Data\Type\AbilitiesLayer;
@@ -26,14 +27,14 @@ class UpdateAbilitiesCodec implements Codec{
         $layerCount = Byte::readUnsigned($in);
         $layers = [];
         for($i = 0; $i < $layerCount; ++$i){
-            $layers[] = $this->readLayer($in);
+            $layers[] = $codec->read(AbilitiesLayer::class, $in);
         }
 
         $pk->data = new AbilitiesData(
-            $commandPermission,
-            $playerPermission,
-            $targetActorUniqueId,
-            $layers
+            commandPermission: $commandPermission,
+            playerPermission: $playerPermission,
+            targetActorUniqueId: $targetActorUniqueId,
+            abilityLayers: $layers
         );
         return $pk;
     }
@@ -45,74 +46,7 @@ class UpdateAbilitiesCodec implements Codec{
         Byte::writeUnsigned($out, $pk->data->commandPermission);
         Byte::writeUnsigned($out, count($pk->data->abilityLayers));
         foreach($pk->data->abilityLayers as $layer){
-            $this->writeLayer($out, $layer);
+            $codec->write(AbilitiesLayer::class, $out, $layer);
         }
-    }
-
-    protected function readLayer(ByteBufferReader $in) : AbilitiesLayer{
-        $layerId = LE::readUnsignedShort($in);
-        $setAbilities = LE::readUnsignedInt($in);
-        $setValues = LE::readUnsignedInt($in);
-        $flySpeed = LE::readFloat($in);
-        $verticalFlySpeed = LE::readFloat($in);
-        $walkSpeed = LE::readFloat($in);
-
-        $abilities = [];
-        for($i = 0; $i < 20; $i++){
-            if($i === 13 || $i === 14){
-                continue;
-            }
-
-            if(($setAbilities & (1 << $i)) !== 0){
-                $abilities[$i] = ($setValues & (1 << $i)) !== 0;
-            }
-        }
-
-        if(($setAbilities & (1 << 13)) === 0){
-            $flySpeed = null;
-        }
-        if(($setAbilities & (1 << 19)) === 0){
-            $verticalFlySpeed = null;
-        }
-        if(($setAbilities & (1 << 14)) === 0){
-            $walkSpeed = null;
-        }
-
-        return new AbilitiesLayer(
-            $layerId,
-            $abilities,
-            $flySpeed,
-            $verticalFlySpeed,
-            $walkSpeed
-        );
-    }
-
-    protected function writeLayer(ByteBufferWriter $out, AbilitiesLayer $layer) : void{
-        LE::writeUnsignedShort($out, $layer->layerId);
-        $setAbilities = 0;
-        $setValues = 0;
-
-        foreach($layer->abilities as $ability => $value){
-            $setAbilities |= (1 << $ability);
-            if($value){
-                $setValues |= (1 << $ability);
-            }
-        }
-
-        if($layer->flySpeed !== null){
-            $setAbilities |= (1 << 13);
-        }
-        if($layer->verticalFlySpeed !== null){
-            $setAbilities |= (1 << 19);
-        }
-        if($layer->walkSpeed !== null){
-            $setAbilities |= (1 << 14);
-        }
-
-        LE::writeUnsignedInt($out, $setAbilities);
-        LE::writeUnsignedInt($out, $setValues);
-        LE::writeFloat($out, $layer->flySpeed ?? 0.0);
-        LE::writeFloat($out, $layer->verticalFlySpeed ?? 0.0);
-        LE::writeFloat($out, $layer->walkSpeed ?? 0.0);
     }
 }

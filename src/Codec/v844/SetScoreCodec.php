@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v844;
 
 use Nicholass003\Axiom\Codec\Codec;
+use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Score\ScorePacketEntry;
 use Nicholass003\Axiom\Enum\SetScorePacketType;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\SetScorePacket;
@@ -19,7 +21,8 @@ class SetScoreCodec implements Codec{
         $pk = new SetScorePacket();
         $pk->type = SetScorePacketType::safe(Byte::readUnsigned($in));
         $isRemove = $pk->type === SetScorePacketType::REMOVE;
-        $pk->entries = $codec->scoreboard()->scoreEntry()->readList($in, $isRemove);
+        $isRemove = $pk->type === SetScorePacketType::REMOVE;
+        $pk->entries = CodecHelper::readList($in, fn($i) => $codec->get(ScorePacketEntry::class)->read($i, $codec, $isRemove));
         return $pk;
     }
 
@@ -27,6 +30,7 @@ class SetScoreCodec implements Codec{
         assert($pk instanceof SetScorePacket);
         Byte::writeUnsigned($out, $pk->type->value);
         $isRemove = $pk->type === SetScorePacketType::REMOVE;
-        $codec->scoreboard()->scoreEntry()->writeList($out, $pk->entries, $isRemove);
+        $isRemove = $pk->type === SetScorePacketType::REMOVE;
+        CodecHelper::writeList($out, $pk->entries, fn($o, $v) => $codec->get(ScorePacketEntry::class)->write($o, $v, $codec, $isRemove));
     }
 }

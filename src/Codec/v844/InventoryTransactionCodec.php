@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\Inventory\InventoryTransactionChangedSlotsHack;
+use Nicholass003\Axiom\Data\Type\Inventory\TransactionData;
 use Nicholass003\Axiom\Packet\InventoryTransactionPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\Byte;
@@ -22,14 +23,14 @@ class InventoryTransactionCodec implements Codec{
         $pk->requestId = VarInt::readSignedInt($in);
         $pk->requestChangedSlots = [];
         if($pk->requestId !== 0){
-            $pk->requestChangedSlots = CodecHelper::readList($in, function(ByteBufferReader $in) : InventoryTransactionChangedSlotsHack{
+            $pk->requestChangedSlots = CodecHelper::readList($in, static function(ByteBufferReader $in) : InventoryTransactionChangedSlotsHack{
                 return new InventoryTransactionChangedSlotsHack(
                     Byte::readUnsigned($in),
                     CodecHelper::readList($in, fn($in) => Byte::readUnsigned($in))
                 );
             });
         }
-        $pk->trData = $codec->inventory()->transaction()->read($in, $codec);
+        $pk->trData = $codec->read(TransactionData::class, $in);
         return $pk;
     }
 
@@ -37,11 +38,11 @@ class InventoryTransactionCodec implements Codec{
         assert($pk instanceof InventoryTransactionPacket);
         VarInt::writeSignedInt($out, $pk->requestId);
         if($pk->requestId !== 0){
-            CodecHelper::writeList($out, $pk->requestChangedSlots, function(ByteBufferWriter $out, InventoryTransactionChangedSlotsHack $changed) : void{
+            CodecHelper::writeList($out, $pk->requestChangedSlots, static function(ByteBufferWriter $out, InventoryTransactionChangedSlotsHack $changed) : void{
                 Byte::writeUnsigned($out, $changed->containerId);
                 CodecHelper::writeList($out, $changed->changedSlotIndexes, fn($out, $index) => Byte::writeUnsigned($out, $index));
             });
         }
-        $codec->inventory()->transaction()->write($out, $pk->trData, $codec);
+        $codec->write(TransactionData::class, $out, $pk->trData);
     }
 }

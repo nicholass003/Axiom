@@ -7,6 +7,8 @@ namespace Nicholass003\Axiom\Codec\v975;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Inventory\FullContainerName;
+use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Packet\InventorySlotPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
@@ -19,9 +21,9 @@ class InventorySlotCodec implements Codec{
         $pk = new InventorySlotPacket();
         $pk->windowId = VarInt::readUnsignedInt($in);
         $pk->inventorySlot = VarInt::readUnsignedInt($in);
-        $pk->containerName = CodecHelper::readOptional($in, $codec->inventory()->container()->read(...));
-        $pk->storage = CodecHelper::readOptional($in, CodecHelper::readNetworkItemStackDescriptor(...));
-        $pk->item = CodecHelper::readNetworkItemStackDescriptor($in);
+        $pk->containerName = CodecHelper::readOptional($in, fn($i) => $codec->read(FullContainerName::class, $i));
+        $pk->storage = CodecHelper::readOptional($in, fn($i) => $codec->read(ItemStackWrapper::class, $i));
+        $pk->item = $codec->read(ItemStackWrapper::class, $in);
         return $pk;
     }
 
@@ -29,8 +31,8 @@ class InventorySlotCodec implements Codec{
         assert($pk instanceof InventorySlotPacket);
         VarInt::writeUnsignedInt($out, $pk->windowId);
         VarInt::writeUnsignedInt($out, $pk->inventorySlot);
-        CodecHelper::writeOptional($out, $pk->containerName, $codec->inventory()->container()->write(...));
-        CodecHelper::writeOptional($out, $pk->storage, CodecHelper::writeNetworkItemStackDescriptor(...));
-        CodecHelper::writeNetworkItemStackDescriptor($out, $pk->item);
+        CodecHelper::writeOptional($out, $pk->containerName, fn($o, $v) => $codec->write(FullContainerName::class, $o, $v));
+        CodecHelper::writeOptional($out, $pk->storage, fn($o, $v) => $codec->write(ItemStackWrapper::class, $o, $v));
+        $codec->write(ItemStackWrapper::class, $out, $pk->item);
     }
 }

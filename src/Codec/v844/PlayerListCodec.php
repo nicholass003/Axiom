@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v844;
 
 use Nicholass003\Axiom\Codec\Codec;
+
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\PlayerListEntry;
+use Nicholass003\Axiom\Data\Type\Skin\SkinData;
 use Nicholass003\Axiom\Enum\PlayerListType;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\PlayerListPacket;
@@ -21,7 +23,7 @@ class PlayerListCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : PlayerListPacket{
         $pk = new PlayerListPacket();
-        $pk->type = PlayerListType::safe(Byte::readUnsigned($in));
+        $pk->type = PlayerListType::from(Byte::readUnsigned($in));
         $count = VarInt::readUnsignedInt($in);
         for($i = 0; $i < $count; ++$i){
             if($pk->type === PlayerListType::ADD){
@@ -31,7 +33,7 @@ class PlayerListCodec implements Codec{
                 $xboxUserId = CodecHelper::readString($in);
                 $platformChatId = CodecHelper::readString($in);
                 $buildPlatform = LE::readSignedInt($in);
-                $skin = $codec->skin()->read($in);
+                $skin = $codec->read(SkinData::class, $in);
                 $isTeacher = CodecHelper::readBool($in);
                 $isHost = CodecHelper::readBool($in);
                 $isSubClient = CodecHelper::readBool($in);
@@ -94,7 +96,7 @@ class PlayerListCodec implements Codec{
                 CodecHelper::writeString($out, $entry->xboxUserId ?? "");
                 CodecHelper::writeString($out, $entry->platformChatId ?? "");
                 LE::writeSignedInt($out, $entry->buildPlatform ?? -1);
-                $codec->skin()->write($out, $entry->skinData);
+                $codec->write(SkinData::class, $out, $entry->skinData);
                 CodecHelper::writeBool($out, $entry->isTeacher ?? false);
                 CodecHelper::writeBool($out, $entry->isHost ?? false);
                 CodecHelper::writeBool($out, $entry->isSubClient ?? false);

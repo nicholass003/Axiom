@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Packet;
 
 use Nicholass003\Axiom\Data\PacketRecipient;
+use Nicholass003\Axiom\Data\Type\GatheringJoinInfo;
 
 class TransferPacket implements Packet{
 
@@ -14,4 +15,6 @@ class TransferPacket implements Packet{
     public string $address;
     public int $port;
     public bool $reloadWorld = false;
+    /** @since v2168 */
+    public ?GatheringJoinInfo $gatheringsConfig = null;
 }

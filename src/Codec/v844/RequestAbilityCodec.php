@@ -46,7 +46,7 @@ class RequestAbilityCodec implements Codec{
             default => throw new \LogicException("Ability value must be bool or float")
         };
         Byte::writeUnsigned($out, $valueType);
-        CodecHelper::writeBool($out, $boolValue, $floatValue);
+        CodecHelper::writeBool($out, $boolValue);
         LE::writeFloat($out, $floatValue);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Nicholass003\Axiom\Data\Type\Skin;
 
+use Nicholass003\Axiom\Codec\Common\Color;
+
 class SkinData{
 
     /**
@@ -24,7 +26,7 @@ class SkinData{
         public readonly string $capeId,
         public readonly string $fullSkinId,
         public readonly string $armSize,
-        public readonly string $skinColor,
+        public readonly ?Color $skinColor,
         public readonly array $personaPieces,
         public readonly array $pieceTintColors,
         public readonly bool $isPremium,

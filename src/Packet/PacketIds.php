@@ -237,4 +237,6 @@ class PacketIds{
     public const CLIENTBOUND_UPDATE_SOUND_DATA = 348;
     public const SEND_PARTY_DESTINATION_COOKIE = 349;
     public const PARTY_DESTINATION_COOKIE_RESPONSE = 350;
+    public const SET_PLAYER_FURNACE_OPTIONS = 351;
+    public const RECORD_STARTED = 352;
 }

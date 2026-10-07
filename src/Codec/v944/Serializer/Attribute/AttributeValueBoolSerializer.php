@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Nicholass003\Axiom\Codec\v944\Serializer\Attribute;
+
+use Nicholass003\Axiom\Codec\CodecHelper;
+use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Codec\SerializerInterface;
+use Nicholass003\Axiom\Codec\Support\StatelessForkable;
+use Nicholass003\Axiom\Data\Type\AttributeValueBool;
+use Nicholass003\Axiom\Enum\AttributeValueType;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\LE;
+
+class AttributeValueBoolSerializer implements SerializerInterface{
+	use StatelessForkable;
+
+	public function read(ByteBufferReader $in, CodecType $codec) : AttributeValueBool{
+		$value = CodecHelper::readBool($in);
+		$operation = CodecHelper::readString($in);
+
+		return new AttributeValueBool(
+			value: $value,
+			operation: $operation
+		);
+	}
+
+	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
+		assert($data instanceof AttributeValueBool);
+
+		CodecHelper::writeBool($out, $data->value);
+		CodecHelper::writeString($out, $data->operation);
+	}
+}

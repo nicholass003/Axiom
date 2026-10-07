@@ -8,6 +8,9 @@ use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\Map\MapDataFlags;
+use Nicholass003\Axiom\Data\Type\Map\MapDecoration;
+use Nicholass003\Axiom\Data\Type\Map\MapImage;
+use Nicholass003\Axiom\Data\Type\Map\MapTrackedObject;
 use Nicholass003\Axiom\Packet\ClientboundMapItemDataPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\Byte;
@@ -26,7 +29,7 @@ class ClientboundMapItemDataCodec implements Codec{
         $pk->origin = CodecHelper::readSignedBlockPosition($in);
 
         if($pk->type->hasMapCreation()){
-            $pk->parentMapIds = $codec->map()->readParentMapIds($in);
+            $pk->parentMapIds = CodecHelper::readList($in, fn($i) => CodecHelper::readActorUniqueId($i));
         }
 
         if($pk->type->requiresScale()){
@@ -34,8 +37,8 @@ class ClientboundMapItemDataCodec implements Codec{
         }
 
         if($pk->type->hasDecorationUpdate()){
-            $pk->trackedEntities = $codec->map()->readTrackedObjects($in);
-            $pk->decorations = $codec->map()->readDecorations($in);
+            $pk->trackedEntities = CodecHelper::readList($in, fn($i) => $codec->read(MapTrackedObject::class, $i));
+            $pk->decorations = CodecHelper::readList($in, fn($i) => $codec->read(MapDecoration::class, $i));
         }
 
         if($pk->type->hasTextureUpdate()){
@@ -48,7 +51,7 @@ class ClientboundMapItemDataCodec implements Codec{
             if($pixelCount !== $expectedCount){
                 throw new \RuntimeException("Expected pixel count $expectedCount, got $pixelCount");
             }
-            $pk->colors = $codec->map()->readImage($in, $width, $height);
+            $pk->colors = $codec->get(MapImage::class)->read($in, $codec, $width, $height);
         }
 
         return $pk;
@@ -63,7 +66,7 @@ class ClientboundMapItemDataCodec implements Codec{
         CodecHelper::writeSignedBlockPosition($out, $pk->origin);
 
         if($pk->type->hasMapCreation()){
-            $codec->map()->writeParentMapIds($out, $pk->parentMapIds);
+            CodecHelper::writeList($out, $pk->parentMapIds, fn($out, $v) => CodecHelper::writeActorUniqueId($out, $v));
         }
 
         if($pk->type->requiresScale()){
@@ -71,8 +74,8 @@ class ClientboundMapItemDataCodec implements Codec{
         }
 
         if($pk->type->hasDecorationUpdate()){
-            $codec->map()->writeTrackedObjects($out, $pk->trackedEntities);
-            $codec->map()->writeDecorations($out, $pk->decorations);
+            CodecHelper::writeList($out, $pk->trackedEntities, fn($out, $v) => $codec->write(MapTrackedObject::class, $out, $v));
+            CodecHelper::writeList($out, $pk->decorations, fn($out, $v) => $codec->write(MapDecoration::class, $out, $v));
         }
 
         if($pk->type->hasTextureUpdate()){
@@ -81,8 +84,8 @@ class ClientboundMapItemDataCodec implements Codec{
             VarInt::writeSignedInt($out, $image->height);
             VarInt::writeSignedInt($out, $pk->xOffset);
             VarInt::writeSignedInt($out, $pk->yOffset);
-            VarInt::writeUnsignedInt($out, $codec->map()->image()->getPixelCount($image));
-            $codec->map()->writeImage($out, $image);
+            VarInt::writeUnsignedInt($out, $image->width * $image->height);
+            $codec->write(MapImage::class, $out, $image);
         }
     }
 }

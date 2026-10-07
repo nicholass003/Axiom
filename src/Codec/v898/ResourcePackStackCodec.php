@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v898;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Experiments;
 use Nicholass003\Axiom\Data\Type\ResourcePack\ResourcePackStackEntry;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\ResourcePackStackPacket;
@@ -20,13 +21,10 @@ class ResourcePackStackCodec implements Codec{
         $pk = new ResourcePackStackPacket();
         $pk->mustAccept = CodecHelper::readBool($in);
 
-        $resourceCount = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $resourceCount; ++$i){
-            $pk->resourcePackStack[] = $this->readEntry($in);
-        }
+        $pk->resourcePackStack = CodecHelper::readList($in, fn($i) => $codec->read(ResourcePackStackEntry::class, $i));
 
         $pk->baseGameVersion = CodecHelper::readString($in);
-        $pk->experiments = $codec->experiments()->read($in);
+        $pk->experiments = $codec->read(Experiments::class, $in);
         $pk->useVanillaEditorPacks = CodecHelper::readBool($in);
 
         return $pk;
@@ -34,29 +32,13 @@ class ResourcePackStackCodec implements Codec{
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ResourcePackStackPacket);
+
         CodecHelper::writeBool($out, $pk->mustAccept);
 
-        VarInt::writeUnsignedInt($out, count($pk->resourcePackStack));
-        foreach($pk->resourcePackStack as $entry){
-            $this->writeEntry($out, $entry);
-        }
+        CodecHelper::writeList($out, $pk->resourcePackStack, fn($o, $v) => $codec->write(ResourcePackStackEntry::class, $o, $v));
 
         CodecHelper::writeString($out, $pk->baseGameVersion);
-        $codec->experiments()->write($out, $pk->experiments);
+        $codec->write(Experiments::class, $out, $pk->experiments);
         CodecHelper::writeBool($out, $pk->useVanillaEditorPacks);
-    }
-
-    protected function readEntry(ByteBufferReader $in) : ResourcePackStackEntry{
-        return new ResourcePackStackEntry(
-            CodecHelper::readString($in),
-            CodecHelper::readString($in),
-            CodecHelper::readString($in)
-        );
-    }
-
-    protected function writeEntry(ByteBufferWriter $out, ResourcePackStackEntry $entry) : void{
-        CodecHelper::writeString($out, $entry->packId);
-        CodecHelper::writeString($out, $entry->version);
-        CodecHelper::writeString($out, $entry->subPackName);
     }
 }

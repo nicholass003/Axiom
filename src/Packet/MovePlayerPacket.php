@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Packet;
 
 use Nicholass003\Axiom\Data\PacketRecipient;
+use Nicholass003\Axiom\Data\Type\MovePlayerTeleportData;
 use Nicholass003\Axiom\Data\Type\Vec3;
 use Nicholass003\Axiom\Enum\MovePlayerMode;
 
@@ -26,7 +27,14 @@ class MovePlayerPacket implements Packet{
     public MovePlayerMode $mode;
     public bool $onGround = false;
     public int $ridingActorRuntimeId = 0;
+
+    /** @deprecated v2168 */
     public int $teleportCause = 0;
+    /** @deprecated v2168 */
     public int $teleportItem = 0;
+
+    /** @since v2168 */
+    public ?MovePlayerTeleportData $telemetryData = null;
+
     public int $tick = 0;
 }

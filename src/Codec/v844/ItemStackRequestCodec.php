@@ -17,14 +17,12 @@ class ItemStackRequestCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : ItemStackRequestPacket{
         $pk = new ItemStackRequestPacket();
-        $pk->requests = CodecHelper::readList($in, fn(ByteBufferReader $in) => $codec->inventory()->request()->read($in, $codec));
+        $pk->requests = CodecHelper::readList($in, fn($i) => $codec->read(ItemStackRequest::class, $i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ItemStackRequestPacket);
-        CodecHelper::writeList($out, $pk->requests, function(ByteBufferWriter $out, ItemStackRequest $request) use($codec) : void{
-            $codec->inventory()->request()->write($out, $request, $codec);
-        });
+        CodecHelper::writeList($out, $pk->requests, fn($o, $v) => $codec->write(ItemStackRequest::class, $o, $v));
     }
 }

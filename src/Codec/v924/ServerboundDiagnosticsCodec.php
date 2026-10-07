@@ -8,10 +8,8 @@ use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\MemoryCategoryCounter;
-use Nicholass003\Axiom\Enum\MemoryCategory;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\ServerboundDiagnosticsPacket;
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
@@ -29,7 +27,7 @@ class ServerboundDiagnosticsCodec implements Codec{
         $pk->avgEndFrameTimeMS = LE::readFloat($in);
         $pk->avgRemainderTimePercent = LE::readFloat($in);
         $pk->avgUnaccountedTimePercent = LE::readFloat($in);
-        $pk->memoryCategoryValues = CodecHelper::readList($in, $this->readCategoryCounter(...));
+        $pk->memoryCategoryValues = CodecHelper::readList($in, fn($i) => $codec->read(MemoryCategoryCounter::class, $i));
         return $pk;
     }
 
@@ -44,17 +42,6 @@ class ServerboundDiagnosticsCodec implements Codec{
         LE::writeFloat($out, $pk->avgEndFrameTimeMS);
         LE::writeFloat($out, $pk->avgRemainderTimePercent);
         LE::writeFloat($out, $pk->avgUnaccountedTimePercent);
-        CodecHelper::writeList($out, $pk->memoryCategoryValues, $this->writeCategoryCounter(...));
-    }
-
-    protected function readCategoryCounter(ByteBufferReader $in) : MemoryCategoryCounter{
-        $category = MemoryCategory::safe(Byte::readUnsigned($in));
-        $bytes = LE::readUnsignedLong($in);
-        return new MemoryCategoryCounter($category, $bytes);
-    }
-
-    protected function writeCategoryCounter(ByteBufferWriter $out, MemoryCategoryCounter $data) : void{
-        Byte::writeUnsigned($out, $data->category->value);
-        LE::writeUnsignedLong($out, $data->bytes);
+        CodecHelper::writeList($out, $pk->memoryCategoryValues, fn($o, $v) => $codec->write(MemoryCategoryCounter::class, $o, $v));
     }
 }

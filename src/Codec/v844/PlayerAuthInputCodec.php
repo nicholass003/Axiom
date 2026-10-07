@@ -7,9 +7,14 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Inventory\StackRequest\ItemStackRequest;
+use Nicholass003\Axiom\Data\Type\ItemInteractionData;
 use Nicholass003\Axiom\Data\Type\PlayerAuthInputData;
 use Nicholass003\Axiom\Data\Type\PlayerAuthInputVehicleInfo;
+use Nicholass003\Axiom\Data\Type\PlayerBlockActionData;
+use Nicholass003\Axiom\Enum\InputMode;
 use Nicholass003\Axiom\Enum\PlayerAuthInputFlag;
+use Nicholass003\Axiom\Enum\PlayMode;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\PlayerAuthInputPacket;
 use pmmp\encoding\ByteBufferReader;
@@ -28,26 +33,26 @@ class PlayerAuthInputCodec implements Codec{
         $moveZ = LE::readFloat($in);
         $headYaw = LE::readFloat($in);
         $flags = CodecHelper::readBitSet($in, PlayerAuthInputFlag::NUMBER_OF_FLAGS->value);
-        $inputMode = VarInt::readUnsignedInt($in);
-        $playMode = VarInt::readUnsignedInt($in);
+        $inputMode = InputMode::safe(VarInt::readUnsignedInt($in));
+        $playMode = PlayMode::safe(VarInt::readUnsignedInt($in));
         $interactionMode = VarInt::readUnsignedInt($in);
         $interactRotation = CodecHelper::readVec2($in);
         $tick = VarInt::readUnsignedLong($in);
         $delta = CodecHelper::readVec3($in);
         $itemInteraction = null;
         if($flags->has(PlayerAuthInputFlag::PERFORM_ITEM_INTERACTION->value)){
-            $itemInteraction = $codec->inventory()->itemInteraction()->read($in, $codec);
+            $itemInteraction = $codec->read(ItemInteractionData::class, $in);
         }
         $itemStackRequest = null;
         if($flags->has(PlayerAuthInputFlag::PERFORM_ITEM_STACK_REQUEST->value)){
-            $itemStackRequest = $codec->inventory()->request()->read($in, $codec);
+            $itemStackRequest = $codec->read(ItemStackRequest::class, $in);
         }
         $blockActions = null;
         if($flags->has(PlayerAuthInputFlag::PERFORM_BLOCK_ACTIONS->value)){
             $count = VarInt::readSignedInt($in);
             $blockActions = [];
             for($i = 0; $i < $count; ++$i){
-                $blockActions[] = $codec->blockAction()->read($in);
+                $blockActions[] = $codec->read(PlayerBlockActionData::class, $in);
             }
         }
         $vehicleInfo = null;
@@ -99,22 +104,22 @@ class PlayerAuthInputCodec implements Codec{
         LE::writeFloat($out, $d->moveVecZ);
         LE::writeFloat($out, $d->headYaw);
         CodecHelper::writeBitSet($out, $d->inputFlags);
-        VarInt::writeUnsignedInt($out, $d->inputMode);
-        VarInt::writeUnsignedInt($out, $d->playMode);
+        VarInt::writeUnsignedInt($out, $d->inputMode->value);
+        VarInt::writeUnsignedInt($out, $d->playMode->value);
         VarInt::writeUnsignedInt($out, $d->interactionMode);
         CodecHelper::writeVec2($out, $d->interactRotation);
         VarInt::writeUnsignedLong($out, $d->tick);
         CodecHelper::writeVec3($out, $d->delta);
         if($d->itemInteractionData !== null){
-            $codec->inventory()->itemInteraction()->write($out, $d->itemInteractionData, $codec);
+            $codec->write(ItemInteractionData::class, $out, $d->itemInteractionData);
         }
         if($d->itemStackRequest !== null){
-            $codec->inventory()->request()->write($out, $d->itemStackRequest, $codec);
+            $codec->write(ItemStackRequest::class, $out, $d->itemStackRequest);
         }
         if($d->blockActions !== null){
             VarInt::writeSignedInt($out, count($d->blockActions));
             foreach($d->blockActions as $action){
-                $codec->blockAction()->write($out, $action);
+                $codec->write(PlayerBlockActionData::class, $out, $action);
             }
         }
         if($d->vehicleInfo !== null){

@@ -17,40 +17,12 @@ class FeatureRegistryCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : FeatureRegistryPacket{
         $pk = new FeatureRegistryPacket();
-        $pk->entries = $this->readEntries($in);
+        $pk->entries = CodecHelper::readList($in, fn($i) => $codec->read(FeatureRegistryPacketEntry::class, $i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof FeatureRegistryPacket);
-        $this->writeEntries($out, $pk->entries);
-    }
-
-    /**
-     * @return list<FeatureRegistryPacketEntry>
-     */
-    protected function readEntries(ByteBufferReader $in) : array{
-        return CodecHelper::readList($in, fn(ByteBufferReader $in) : FeatureRegistryPacketEntry => $this->readEntry($in));
-    }
-
-    /**
-     * @param list<FeatureRegistryPacketEntry> $entries
-     */
-    protected function writeEntries(ByteBufferWriter $out, array $entries) : void{
-        CodecHelper::writeList($out, $entries, function(ByteBufferWriter $out, FeatureRegistryPacketEntry $entry) : void{
-            $this->writeEntry($out, $entry);
-        });
-    }
-
-    protected function readEntry(ByteBufferReader $in) : FeatureRegistryPacketEntry{
-        return new FeatureRegistryPacketEntry(
-            CodecHelper::readString($in),
-            CodecHelper::readString($in)
-        );
-    }
-
-    protected function writeEntry(ByteBufferWriter $out, FeatureRegistryPacketEntry $entry) : void{
-        CodecHelper::writeString($out, $entry->featureName);
-        CodecHelper::writeString($out, $entry->featureJson);
+        $codec->write(FeatureRegistryPacketEntry::class, $out, $pk->entries);
     }
 }

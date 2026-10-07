@@ -13,10 +13,22 @@ class MoveActorDeltaPacket implements Packet{
 
     public int $actorRuntimeId;
     public int $flags;
-    public float $xPos = 0.0;
-    public float $yPos = 0.0;
-    public float $zPos = 0.0;
-    public float $pitch = 0.0;
-    public float $yaw = 0.0;
-    public float $headYaw = 0.0;
+
+    public ?float $xPos = null;
+    public ?float $yPos = null;
+    public ?float $zPos = null;
+    public ?float $pitch = null;
+    public ?float $yaw = null;
+    public ?float $headYaw = null;
+
+    /** @since v2168 */
+    public bool $onGround = false;
+    /** @since v2168 */
+    public bool $teleport = false;
+    /** @since v2168 */
+    public bool $forceMoveLocalEntity = false;
+    /** @since v2168 */
+    public bool $forceCompletion = false;
+    /** @since v2193 */
+    public int $ticks = 0;
 }

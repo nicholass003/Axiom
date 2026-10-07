@@ -17,23 +17,12 @@ class ServerPresenceInfoCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : ServerPresenceInfoPacket{
         $pk = new ServerPresenceInfoPacket();
-        $pk->presenceConfig = CodecHelper::readOptional($in, $this->readPresenceConfig(...));
+        $pk->presenceConfig = CodecHelper::readOptional($in, fn($i) => $codec->read(PresenceConfig::class, $i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ServerPresenceInfoPacket);
-        CodecHelper::writeOptional($out, $pk->presenceConfig, $this->writePresenceConfig(...));
-    }
-
-    protected function readPresenceConfig(ByteBufferReader $in) : PresenceConfig{
-        $experienceName = CodecHelper::readString($in);
-        $worldName = CodecHelper::readString($in);
-        return new PresenceConfig($experienceName, $worldName);
-    }
-
-    protected function writePresenceConfig(ByteBufferWriter $out, PresenceConfig $data) : void{
-        CodecHelper::writeString($out, $data->experienceName);
-        CodecHelper::writeString($out, $data->worldName);
+        CodecHelper::writeOptional($out, $pk->presenceConfig, fn($o, $v) => $codec->write(PresenceConfig::class, $o, $v));
     }
 }

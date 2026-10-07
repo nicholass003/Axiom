@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Data\Type\Recipe;
 
 use Nicholass003\Axiom\Data\Type\ItemStack;
+use Nicholass003\Axiom\Enum\RecipeType;
 
 final class ShapedRecipe extends RecipeWithTypeId{
 
@@ -13,7 +14,7 @@ final class ShapedRecipe extends RecipeWithTypeId{
      * @param list<ItemStack> $output
      */
     public function __construct(
-        int $typeId,
+        RecipeType $typeId,
         public readonly string $recipeId,
         public readonly array $input,
         public readonly array $output,

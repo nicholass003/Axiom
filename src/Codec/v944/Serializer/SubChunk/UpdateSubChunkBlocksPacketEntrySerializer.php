@@ -5,45 +5,34 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v944\Serializer\SubChunk;
 
 use Nicholass003\Axiom\Codec\CodecHelper;
-use Nicholass003\Axiom\Codec\Common\Serializer\SubChunk\UpdateSubChunkBlocksPacketEntrySerializer as BaseUpdateSubChunkBlocksPacketEntrySerializer;
+use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Codec\SerializerInterface;
+use Nicholass003\Axiom\Codec\Support\StatelessForkable;
 use Nicholass003\Axiom\Data\Type\SubChunk\UpdateSubChunkBlocksPacketEntry;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
 
-class UpdateSubChunkBlocksPacketEntrySerializer extends BaseUpdateSubChunkBlocksPacketEntrySerializer{
+class UpdateSubChunkBlocksPacketEntrySerializer implements SerializerInterface{
+	use StatelessForkable;
 
-    public function read(ByteBufferReader $in) : UpdateSubChunkBlocksPacketEntry{
-        $blockPosition = CodecHelper::readSignedBlockPosition($in);
-        $blockRuntimeId = VarInt::readUnsignedInt($in);
-        $flags = VarInt::readUnsignedInt($in);
-        $syncedUpdateType = VarInt::readUnsignedInt($in);
-        $actorUniqueId = CodecHelper::readActorUniqueId($in);
-
+    public function read(ByteBufferReader $in, CodecType $codec) : UpdateSubChunkBlocksPacketEntry{
         return new UpdateSubChunkBlocksPacketEntry(
-            $blockPosition, $blockRuntimeId, $flags, $syncedUpdateType, $actorUniqueId
+            blockPosition: CodecHelper::readSignedBlockPosition($in),
+            blockRuntimeId: VarInt::readUnsignedInt($in),
+            flags: VarInt::readUnsignedInt($in),
+            syncedUpdateType: VarInt::readUnsignedInt($in),
+            actorUniqueId: CodecHelper::readActorUniqueId($in)
         );
     }
 
-    public function write(ByteBufferWriter $out, UpdateSubChunkBlocksPacketEntry $entry) : void{
-        CodecHelper::writeSignedBlockPosition($out, $entry->blockPosition);
-        VarInt::writeUnsignedInt($out, $entry->blockRuntimeId);
-        VarInt::writeUnsignedInt($out, $entry->flags);
-        VarInt::writeUnsignedInt($out, $entry->syncedUpdateType);
-        CodecHelper::writeActorUniqueId($out, $entry->actorUniqueId);
-    }
+    public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
+        assert($data instanceof UpdateSubChunkBlocksPacketEntry);
 
-    /**
-     * @return list<UpdateSubChunkBlocksPacketEntry>
-     */
-    public function readList(ByteBufferReader $in) : array{
-        return CodecHelper::readList($in, fn($in) => $this->read($in));
-    }
-
-    /**
-     * @param list<UpdateSubChunkBlocksPacketEntry> $entries
-     */
-    public function writeList(ByteBufferWriter $out, array $entries) : void{
-        CodecHelper::writeList($out, $entries, fn($out, $e) => $this->write($out, $e));
+        CodecHelper::writeSignedBlockPosition($out, $data->blockPosition);
+        VarInt::writeUnsignedInt($out, $data->blockRuntimeId);
+        VarInt::writeUnsignedInt($out, $data->flags);
+        VarInt::writeUnsignedInt($out, $data->syncedUpdateType);
+        CodecHelper::writeActorUniqueId($out, $data->actorUniqueId);
     }
 }

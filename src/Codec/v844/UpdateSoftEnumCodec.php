@@ -19,7 +19,7 @@ class UpdateSoftEnumCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : UpdateSoftEnumPacket{
         $pk = new UpdateSoftEnumPacket();
         $pk->enumName = CodecHelper::readString($in);
-        $pk->values = CodecHelper::readList($in, fn($in) => CodecHelper::readString($in));
+        $pk->values = CodecHelper::readList($in, fn($i) => CodecHelper::readString($i));
         $pk->type = UpdateSoftEnumType::safe(Byte::readUnsigned($in));
         return $pk;
     }
@@ -27,7 +27,7 @@ class UpdateSoftEnumCodec implements Codec{
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof UpdateSoftEnumPacket);
         CodecHelper::writeString($out, $pk->enumName);
-        CodecHelper::writeList($out, $pk->values, fn($out, $v) => CodecHelper::writeString($out, $v));
+        CodecHelper::writeList($out, $pk->values, fn($o, $v) => CodecHelper::writeString($o, $v));
         Byte::writeUnsigned($out, $pk->type->value);
     }
 }

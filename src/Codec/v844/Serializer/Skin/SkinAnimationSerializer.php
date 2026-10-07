@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Nicholass003\Axiom\Codec\v844\Serializer\Skin;
+
+use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Codec\SerializerInterface;
+use Nicholass003\Axiom\Codec\Support\StatelessForkable;
+use Nicholass003\Axiom\Data\Type\Skin\SkinAnimation;
+use Nicholass003\Axiom\Data\Type\Skin\SkinImage;
+use pmmp\encoding\ByteBufferReader;
+use pmmp\encoding\ByteBufferWriter;
+use pmmp\encoding\LE;
+
+class SkinAnimationSerializer implements SerializerInterface{
+	use StatelessForkable;
+
+	public function read(ByteBufferReader $in, CodecType $codec) : SkinAnimation{
+		return new SkinAnimation(
+			image: $codec->read(SkinImage::class, $in),
+			type: LE::readUnsignedInt($in),
+			frames: LE::readFloat($in),
+			expressionType: LE::readUnsignedInt($in)
+		);
+	}
+
+	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
+		assert($data instanceof SkinAnimation);
+
+		$codec->write(SkinImage::class, $out, $data->image);
+		LE::writeUnsignedInt($out, $data->type);
+		LE::writeFloat($out, $data->frames);
+		LE::writeUnsignedInt($out, $data->expressionType);
+	}
+}

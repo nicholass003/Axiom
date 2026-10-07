@@ -12,34 +12,17 @@ use Nicholass003\Axiom\Packet\ItemRegistryPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
-use pmmp\encoding\VarInt;
 
 class ItemRegistryCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : ItemRegistryPacket{
         $pk = new ItemRegistryPacket();
-        $count = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $count; ++$i){
-            $stringId = CodecHelper::readString($in);
-            $numericId = LE::readSignedShort($in);
-            $componentBased = CodecHelper::readBool($in);
-            $version = VarInt::readSignedInt($in);
-            $nbt = CodecHelper::readNbt($in);
-            $pk->entries[] = new ItemTypeEntry($stringId, $numericId, $componentBased, $version, $nbt);
-        }
+        $pk->entries = CodecHelper::readList($in, fn($i) => $codec->read(ItemTypeEntry::class, $i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ItemRegistryPacket);
-        VarInt::writeUnsignedInt($out, count($pk->entries));
-        foreach($pk->entries as $entry){
-            CodecHelper::writeString($out, $entry->stringId);
-            LE::writeSignedShort($out, $entry->numericId);
-            CodecHelper::writeBool($out, $entry->componentBased);
-            VarInt::writeSignedInt($out, $entry->version);
-            CodecHelper::writeNbt($out, $entry->componentNbt);
-        }
+        CodecHelper::writeList($out, $pk->entries, fn($o, $v) => $codec->write(ItemTypeEntry::class, $o, $v));
     }
 }

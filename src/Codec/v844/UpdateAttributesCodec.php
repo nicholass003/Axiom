@@ -12,7 +12,6 @@ use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\UpdateAttributesPacket;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
 class UpdateAttributesCodec implements Codec{
@@ -22,10 +21,7 @@ class UpdateAttributesCodec implements Codec{
 
         $pk->actorRuntimeId = CodecHelper::readActorRuntimeId($in);
 
-        $count = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $count; ++$i){
-            $pk->entries[] = $this->readAttribute($in, $codec);
-        }
+        $pk->entries = CodecHelper::readList($in, fn($i) => $codec->read(UpdateAttribute::class, $i));
 
         $pk->tick = VarInt::readUnsignedLong($in);
 
@@ -37,53 +33,8 @@ class UpdateAttributesCodec implements Codec{
 
         CodecHelper::writeActorRuntimeId($out, $pk->actorRuntimeId);
 
-        VarInt::writeUnsignedInt($out, count($pk->entries));
-        foreach($pk->entries as $entry){
-            $this->writeAttribute($out, $entry, $codec);
-        }
+        CodecHelper::writeList($out, $pk->entries, fn($o, $v) => $codec->write(UpdateAttribute::class, $o, $v));
 
         VarInt::writeUnsignedLong($out, $pk->tick);
-    }
-
-    protected function readAttribute(ByteBufferReader $in, CodecType $codec) : UpdateAttribute{
-        $min = LE::readFloat($in);
-        $max = LE::readFloat($in);
-        $current = LE::readFloat($in);
-        $defaultMin = LE::readFloat($in);
-        $defaultMax = LE::readFloat($in);
-        $default = LE::readFloat($in);
-        $id = CodecHelper::readString($in);
-
-        $modifiers = [];
-        $count = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $count; ++$i){
-            $modifiers[] = $codec->attribute()->read($in);
-        }
-
-        return new UpdateAttribute(
-            $id,
-            $min,
-            $max,
-            $current,
-            $defaultMin,
-            $defaultMax,
-            $default,
-            $modifiers
-        );
-    }
-
-    protected function writeAttribute(ByteBufferWriter $out, UpdateAttribute $attr, CodecType $codec) : void{
-        LE::writeFloat($out, $attr->min);
-        LE::writeFloat($out, $attr->max);
-        LE::writeFloat($out, $attr->current);
-        LE::writeFloat($out, $attr->defaultMin);
-        LE::writeFloat($out, $attr->defaultMax);
-        LE::writeFloat($out, $attr->default);
-        CodecHelper::writeString($out, $attr->id);
-
-        VarInt::writeUnsignedInt($out, count($attr->modifiers));
-        foreach($attr->modifiers as $modifier){
-            $codec->attribute()->write($out, $modifier);
-        }
     }
 }

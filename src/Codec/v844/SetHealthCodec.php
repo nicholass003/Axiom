@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v844;
 
 use Nicholass003\Axiom\Codec\Codec;
-use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\SetHealthPacket;

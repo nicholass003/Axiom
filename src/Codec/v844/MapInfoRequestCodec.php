@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Map\MapInfoRequestPacketClientPixel;
 use Nicholass003\Axiom\Packet\MapInfoRequestPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
@@ -21,7 +22,7 @@ class MapInfoRequestCodec implements Codec{
 
         $count = LE::readUnsignedInt($in);
         for($i = 0; $i < $count; ++$i){
-            $pk->clientPixels[] = $codec->map()->clientPixel()->read($in);
+            $pk->clientPixels[] = $codec->read(MapInfoRequestPacketClientPixel::class, $in);
         }
 
         return $pk;
@@ -33,7 +34,7 @@ class MapInfoRequestCodec implements Codec{
 
         LE::writeUnsignedInt($out, count($pk->clientPixels));
         foreach($pk->clientPixels as $pixel){
-            $codec->map()->clientPixel()->write($out, $pixel);
+            $codec->write(MapInfoRequestPacketClientPixel::class, $out, $pixel);
         }
     }
 }

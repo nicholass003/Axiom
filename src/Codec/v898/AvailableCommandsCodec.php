@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v898;
 
 use Nicholass003\Axiom\Codec\Codec;
+use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
-use Nicholass003\Axiom\Codec\v898\Serializer\Command\ChainedSubCommandDataSerializer;
-use Nicholass003\Axiom\Codec\v898\Serializer\Command\CommandEnumSerializer;
+use Nicholass003\Axiom\Data\Type\Command\ChainedSubCommandRawData;
+use Nicholass003\Axiom\Data\Type\Command\CommandEnumConstraintRawData;
+use Nicholass003\Axiom\Data\Type\Command\CommandEnumRawData;
+use Nicholass003\Axiom\Data\Type\Command\CommandRawData;
+use Nicholass003\Axiom\Data\Type\Command\CommandSoftEnum;
 use Nicholass003\Axiom\Packet\AvailableCommandsPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
@@ -16,35 +20,27 @@ use pmmp\encoding\ByteBufferWriter;
 class AvailableCommandsCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : AvailableCommandsPacket{
-        $enum = $codec->command()->enum();
-        $chainedSubCommand = $codec->command()->chainedSubCommand();
-        assert($enum instanceof CommandEnumSerializer);
-        assert($chainedSubCommand instanceof ChainedSubCommandDataSerializer);
         $pk = new AvailableCommandsPacket();
-        $pk->enumValues = $codec->command()->readEnumValues($in);
-        $pk->chainedSubCommandValues = $codec->command()->readChainedSubCommandValues($in);
-        $pk->postfixes = $codec->command()->readPostfixes($in);
-        $pk->enums = $enum->readList($in);
-        $pk->chainedSubCommandData = $chainedSubCommand->readList($in);
-        $pk->commandData = $codec->command()->commandData()->readList($in);
-        $pk->softEnums = $codec->command()->softEnum()->readList($in);
-        $pk->enumConstraints = $codec->command()->enumConstraint()->readList($in);
+        $pk->enumValues = CodecHelper::readList($in, fn($in) => CodecHelper::readString($in));
+        $pk->chainedSubCommandValues = CodecHelper::readList($in, fn($in) => CodecHelper::readString($in));
+        $pk->postfixes = CodecHelper::readList($in, fn($in) => CodecHelper::readString($in));
+        $pk->enums = CodecHelper::readList($in, fn($in) => $codec->read(CommandEnumRawData::class, $in));
+        $pk->chainedSubCommandData = CodecHelper::readList($in, fn($in) => $codec->read(ChainedSubCommandRawData::class, $in));
+        $pk->commandData = CodecHelper::readList($in, fn($in) => $codec->read(CommandRawData::class, $in));
+        $pk->softEnums = CodecHelper::readList($in, fn($in) => $codec->read(CommandSoftEnum::class, $in));
+        $pk->enumConstraints = CodecHelper::readList($in, fn($in) => $codec->read(CommandEnumConstraintRawData::class, $in));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof AvailableCommandsPacket);
-        $enum = $codec->command()->enum();
-        $chainedSubCommand = $codec->command()->chainedSubCommand();
-        assert($enum instanceof CommandEnumSerializer);
-        assert($chainedSubCommand instanceof ChainedSubCommandDataSerializer);
-        $codec->command()->writeEnumValues($out, $pk->enumValues);
-        $codec->command()->writeChainedSubCommandValues($out, $pk->chainedSubCommandValues);
-        $codec->command()->writePostfixes($out, $pk->postfixes);
-        $enum->writeList($out, $pk->enums);
-        $chainedSubCommand->writeList($out, $pk->chainedSubCommandData);
-        $codec->command()->commandData()->writeList($out, $pk->commandData);
-        $codec->command()->softEnum()->writeList($out, $pk->softEnums);
-        $codec->command()->enumConstraint()->writeList($out, $pk->enumConstraints);
+        CodecHelper::writeList($out, $pk->enumValues, fn($out, $v) => CodecHelper::writeString($out, $v));
+        CodecHelper::writeList($out, $pk->chainedSubCommandValues, fn($out, $v) => CodecHelper::writeString($out, $v));
+        CodecHelper::writeList($out, $pk->postfixes, fn($out, $v) => CodecHelper::writeString($out, $v));
+        CodecHelper::writeList($out, $pk->enums, fn($out, $v) => $codec->write(CommandEnumRawData::class, $out, $v));
+        CodecHelper::writeList($out, $pk->chainedSubCommandData, fn($out, $v) => $codec->write(ChainedSubCommandRawData::class, $out, $v));
+        CodecHelper::writeList($out, $pk->commandData, fn($out, $v) => $codec->write(CommandRawData::class, $out, $v));
+        CodecHelper::writeList($out, $pk->softEnums, fn($out, $v) => $codec->write(CommandSoftEnum::class, $out, $v));
+        CodecHelper::writeList($out, $pk->enumConstraints, fn($out, $v) => $codec->write(CommandEnumConstraintRawData::class, $out, $v));
     }
 }

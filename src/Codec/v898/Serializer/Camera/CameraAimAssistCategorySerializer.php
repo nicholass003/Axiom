@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec\v898\Serializer\Camera;
 
 use Nicholass003\Axiom\Codec\CodecHelper;
-use Nicholass003\Axiom\Codec\Common\Serializer\Camera\CameraAimAssistCategorySerializer as BaseCameraAimAssistCategorySerializer;
+use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Codec\SerializerInterface;
+use Nicholass003\Axiom\Codec\Support\StatelessForkable;
 use Nicholass003\Axiom\Data\Type\Camera\CameraAimAssistCategory;
 use Nicholass003\Axiom\Data\Type\Camera\CameraAimAssistCategoryBlockPriority;
 use Nicholass003\Axiom\Data\Type\Camera\CameraAimAssistCategoryEntityPriority;
@@ -14,48 +16,61 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
-class CameraAimAssistCategorySerializer extends BaseCameraAimAssistCategorySerializer{
+class CameraAimAssistCategorySerializer implements SerializerInterface{
+	use StatelessForkable;
 
-    public function read(ByteBufferReader $in) : CameraAimAssistCategory{
-        $entities = [];
-        $entityCount = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $entityCount; ++$i){
-            $entities[] = new CameraAimAssistCategoryEntityPriority(
-                CodecHelper::readString($in),
-                LE::readSignedInt($in)
-            );
-        }
+	public function read(ByteBufferReader $in, CodecType $codec) : CameraAimAssistCategory{
+		$entities = [];
+		$entityCount = VarInt::readUnsignedInt($in);
+		for($i = 0; $i < $entityCount; ++$i){
+			$entities[] = $codec->read(CameraAimAssistCategoryEntityPriority::class, $in);
+		}
 
-        $blocks = [];
-        $blockCount = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $blockCount; ++$i){
-            $blocks[] = new CameraAimAssistCategoryBlockPriority(
-                CodecHelper::readString($in),
-                LE::readSignedInt($in)
-            );
-        }
+		$blocks = [];
+		$blockCount = VarInt::readUnsignedInt($in);
+		for($i = 0; $i < $blockCount; ++$i){
+			$blocks[] = $codec->read(CameraAimAssistCategoryBlockPriority::class, $in);
+		}
 
-        $defaultEntity = CodecHelper::readOptional($in, fn($i) => LE::readSignedInt($i));
-        $defaultBlock = CodecHelper::readOptional($in, fn($i) => LE::readSignedInt($i));
+		$blockTags = [];
+		for($i = 0, $len = VarInt::readUnsignedInt($in); $i < $len; ++$i){
+			$blockTags[] = VarInt::readUnsignedInt($in);
+		}
 
-        return new CameraAimAssistCategory(CodecHelper::readString($in),$entities, $blocks, defaultEntityPriority: $defaultEntity, defaultBlockPriority: $defaultBlock);
-    }
+		$defaultEntity = CodecHelper::readOptional($in, fn($i) => LE::readSignedInt($i));
+		$defaultBlock = CodecHelper::readOptional($in, fn($i) => LE::readSignedInt($i));
+		$name = CodecHelper::readString($in);
 
-    public function write(ByteBufferWriter $out, CameraAimAssistCategory $data) : void{
-        CodecHelper::writeString($out, $data->name);
-        VarInt::writeUnsignedInt($out, count($data->entities));
-        foreach($data->entities as $e){
-            CodecHelper::writeString($out, $e->identifier);
-            LE::writeSignedInt($out, $e->priority);
-        }
+		return new CameraAimAssistCategory(
+			name: $name,
+			entities: $entities,
+			blocks: $blocks,
+			blockTags: $blockTags,
+			defaultEntityPriority: $defaultEntity,
+			defaultBlockPriority: $defaultBlock
+		);
+	}
 
-        VarInt::writeUnsignedInt($out, count($data->blocks));
-        foreach($data->blocks as $b){
-            CodecHelper::writeString($out, $b->identifier);
-            LE::writeSignedInt($out, $b->priority);
-        }
+	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
+		assert($data instanceof CameraAimAssistCategory);
 
-        CodecHelper::writeOptional($out, $data->defaultEntityPriority, fn($o, $v) => LE::writeSignedInt($o, $v));
-        CodecHelper::writeOptional($out, $data->defaultBlockPriority, fn($o, $v) => LE::writeSignedInt($o, $v));
-    }
+		VarInt::writeUnsignedInt($out, count($data->entities));
+		foreach($data->entities as $e){
+			$codec->write(CameraAimAssistCategoryEntityPriority::class, $out, $e);
+		}
+
+		VarInt::writeUnsignedInt($out, count($data->blocks));
+		foreach($data->blocks as $b){
+			$codec->write(CameraAimAssistCategoryBlockPriority::class, $out, $b);
+		}
+
+		VarInt::writeUnsignedInt($out, count($data->blockTags));
+		foreach($data->blockTags as $tag){
+			VarInt::writeUnsignedInt($out, $tag);
+		}
+
+		CodecHelper::writeOptional($out, $data->defaultEntityPriority, fn($o, $v) => LE::writeSignedInt($o, $v));
+		CodecHelper::writeOptional($out, $data->defaultBlockPriority, fn($o, $v) => LE::writeSignedInt($o, $v));
+		CodecHelper::writeString($out, $data->name);
+	}
 }

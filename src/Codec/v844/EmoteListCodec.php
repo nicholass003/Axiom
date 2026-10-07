@@ -17,29 +17,13 @@ class EmoteListCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : EmoteListPacket{
         $pk = new EmoteListPacket();
         $pk->playerActorRuntimeId = CodecHelper::readActorRuntimeId($in);
-        $pk->emoteIds = $this->readEmoteIds($in);
+        $pk->emoteIds = CodecHelper::readList($in, fn($i) => CodecHelper::readUuid($i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof EmoteListPacket);
         CodecHelper::writeActorRuntimeId($out, $pk->playerActorRuntimeId);
-        $this->writeEmoteIds($out, $pk->emoteIds);
-    }
-
-    /**
-     * @return list<string>
-     */
-    protected function readEmoteIds(ByteBufferReader $in) : array{
-        return CodecHelper::readList($in, static fn(ByteBufferReader $in) : string => CodecHelper::readUuid($in));
-    }
-
-    /**
-     * @param list<string> $emoteIds
-     */
-    protected function writeEmoteIds(ByteBufferWriter $out, array $emoteIds) : void{
-        CodecHelper::writeList($out, $emoteIds, static function(ByteBufferWriter $out, string $emoteId) : void{
-            CodecHelper::writeUuid($out, $emoteId);
-        });
+        CodecHelper::writeList($out, $pk->emoteIds, fn($o, $v) => CodecHelper::writeUuid($o, $v));
     }
 }

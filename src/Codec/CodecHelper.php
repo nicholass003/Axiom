@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Codec;
 
 use Nicholass003\Axiom\Codec\Common\BitSet;
+use Nicholass003\Axiom\Codec\Common\Color;
 use Nicholass003\Axiom\Codec\Common\Serializer\NetworkNbtSerializer;
 use Nicholass003\Axiom\Data\Type\BlockPosition;
 use Nicholass003\Axiom\Data\Type\ChunkPosition;
 use Nicholass003\Axiom\Data\Type\EntityLink;
 use Nicholass003\Axiom\Data\Type\ItemStack;
-use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPosition;
 use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPositionOffset;
 use Nicholass003\Axiom\Data\Type\Vec2;
@@ -22,11 +22,11 @@ use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
-use pocketmine\utils\Binary;
-use function count;
-use function strlen;
-use function strrev;
-use function substr;
+    use pocketmine\utils\Binary;
+    use function count;
+    use function strlen;
+    use function strrev;
+    use function substr;
 
 class CodecHelper{
 
@@ -217,6 +217,44 @@ class CodecHelper{
     }
 
     /**
+     * Reads a dummy optional boolean that should always be present (always reads true).
+     * Used when a field was previously optional but is now required.
+     */
+    public static function readDummyOptional(ByteBufferReader $in) : void{
+        if(!self::readBool($in)){
+            throw new \RuntimeException("Dummy optional bool should always be 1");
+        }
+    }
+
+    /**
+     * Writes a dummy optional boolean (always writes 1).
+     * Used when a field was previously optional but is now required.
+     */
+    public static function writeDummyOptional(ByteBufferWriter $out) : void{
+        self::writeBool($out, true);
+    }
+
+    /**
+     * @template T
+     * @param \Closure(ByteBufferReader): T $reader
+     * @return T|null
+     */
+    public static function readDoubleOptional(ByteBufferReader $in, \Closure $reader) : mixed{
+        self::readDummyOptional($in);
+        return self::readOptional($in, $reader);
+    }
+
+    /**
+     * @template T
+     * @param T|null $value
+     * @param \Closure(ByteBufferWriter, T): void $writer
+     */
+    public static function writeDoubleOptional(ByteBufferWriter $out, mixed $value, \Closure $writer) : void{
+        self::writeDummyOptional($out);
+        self::writeOptional($out, $value, $writer);
+    }
+
+    /**
      * @template T
      * @param \Closure(ByteBufferReader): T $reader
      * @return list<T>
@@ -258,77 +296,19 @@ class CodecHelper{
         $out->writeByteArray($nbtData);
     }
 
-    public static function readNetworkItemStackDescriptor(ByteBufferReader $in) : ItemStackWrapper{
-		$id = LE::readSignedShort($in);
-		$count = LE::readUnsignedShort($in);
-		$meta = VarInt::readUnsignedInt($in);
-
-		$hasNetId = self::readBool($in);
-		if($hasNetId){
-			$variant = VarInt::readUnsignedInt($in);
-			$stackId = VarInt::readSignedInt($in);
-		}else{
-			$variant = 0;
-			$stackId = 0;
-		}
-
-		$blockRuntimeId = VarInt::readUnsignedInt($in);
-		$rawExtraData = self::readString($in);
-        return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData), $variant);
-    }
-
-    public static function writeNetworkItemStackDescriptor(ByteBufferWriter $out, ItemStackWrapper $wrapper) : void{
-		LE::writeSignedShort($out, $wrapper->itemStack->id);
-		LE::writeUnsignedShort($out, $wrapper->itemStack->count);
-		VarInt::writeUnsignedInt($out, $wrapper->itemStack->meta);
-
-		self::writeBool($out, $hasNetId = $wrapper->stackId !== 0);
-		if($hasNetId){
-			VarInt::writeUnsignedInt($out, $wrapper->stackIdVariant);
-			VarInt::writeSignedInt($out, $wrapper->stackId);
-		}
-
-		VarInt::writeUnsignedInt($out, $wrapper->itemStack->blockRuntimeId);
-		self::writeString($out, $wrapper->itemStack->rawExtraData);
-    }
-
-    public static function readItemStackWrapper(ByteBufferReader $in) : ItemStackWrapper{
-        $id = VarInt::readSignedInt($in);
-        if($id === 0){
-            return new ItemStackWrapper(0, new ItemStack(0, 0, 0, 0, ''));
-        }
-        $count = LE::readUnsignedShort($in);
-        $meta = VarInt::readUnsignedInt($in);
-        $hasNetId = self::readBool($in);
-        $stackId = $hasNetId ? self::readServerItemStackId($in) : 0;
-        $blockRuntimeId = VarInt::readSignedInt($in);
-        $rawExtraData = self::readString($in);
-        return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData));
-    }
-
-    public static function writeItemStackWrapper(ByteBufferWriter $out, ItemStackWrapper $wrapper) : void{
-        $item = $wrapper->itemStack;
-        if($item->id === 0){
-            VarInt::writeSignedInt($out, 0);
-            return;
-        }
-        VarInt::writeSignedInt($out, $item->id);
-        LE::writeUnsignedShort($out, $item->count);
-        VarInt::writeUnsignedInt($out, $item->meta);
-        $hasNetId = $wrapper->stackId !== 0;
-        self::writeBool($out, $hasNetId);
-        if($hasNetId){
-            self::writeServerItemStackId($out, $wrapper->stackId);
-        }
-        VarInt::writeSignedInt($out, $item->blockRuntimeId);
-        self::writeString($out, $item->rawExtraData);
-    }
-
-    private static function readServerItemStackId(ByteBufferReader $in) : int{
+    public static function readServerItemStackId(ByteBufferReader $in) : int{
         return VarInt::readSignedInt($in);
     }
 
-    private static function writeServerItemStackId(ByteBufferWriter $out, int $id) : void{
+    public static function writeServerItemStackId(ByteBufferWriter $out, int $id) : void{
+        VarInt::writeSignedInt($out, $id);
+    }
+
+    public static function readItemStackRequestId(ByteBufferReader $in) : int{
+        return VarInt::readSignedInt($in);
+    }
+
+    public static function writeItemStackRequestId(ByteBufferWriter $out, int $id) : void{
         VarInt::writeSignedInt($out, $id);
     }
 
@@ -462,5 +442,19 @@ class CodecHelper{
         Byte::writeSigned($out, $pos->xOffset);
         Byte::writeSigned($out, $pos->yOffset);
         Byte::writeSigned($out, $pos->zOffset);
+    }
+
+    /**
+     * Reads a color as an ARGB integer (Little Endian).
+     */
+    public static function readColor(ByteBufferReader $in) : Color{
+        return Color::fromARGB(LE::readUnsignedInt($in));
+    }
+
+    /**
+     * Writes a color as an ARGB integer (Little Endian).
+     */
+    public static function writeColor(ByteBufferWriter $out, Color $color) : void{
+        LE::writeUnsignedInt($out, $color->toARGB());
     }
 }

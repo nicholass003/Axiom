@@ -21,7 +21,7 @@ class DimensionDataCodec implements Codec{
         $count = VarInt::readUnsignedInt($in);
         for($i = 0; $i < $count; ++$i){
             $dimensionName = CodecHelper::readString($in);
-            $pk->definitions[$dimensionName] = $this->readDimensionData($in);
+            $pk->definitions[$dimensionName] = $codec->read(DimensionData::class, $in);
         }
         return $pk;
     }
@@ -31,21 +31,7 @@ class DimensionDataCodec implements Codec{
         VarInt::writeUnsignedInt($out, count($pk->definitions));
         foreach($pk->definitions as $name => $data){
             CodecHelper::writeString($out, $name);
-            $this->writeDimensionData($out, $data);
+            $codec->write(DimensionData::class, $out, $data);
         }
-    }
-
-    protected function readDimensionData(ByteBufferReader $in) : DimensionData{
-        return new DimensionData(
-            VarInt::readSignedInt($in),
-            VarInt::readSignedInt($in),
-            VarInt::readSignedInt($in)
-        );
-    }
-
-    protected function writeDimensionData(ByteBufferWriter $out, DimensionData $data) : void{
-        VarInt::writeSignedInt($out, $data->maxHeight);
-        VarInt::writeSignedInt($out, $data->minHeight);
-        VarInt::writeSignedInt($out, $data->generator);
     }
 }

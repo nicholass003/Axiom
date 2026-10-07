@@ -10,7 +10,6 @@ use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\EmoteFlags;
 use Nicholass003\Axiom\Packet\EmotePacket;
 use Nicholass003\Axiom\Packet\Packet;
-use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -24,7 +23,7 @@ class EmoteCodec implements Codec{
         $pk->emoteLengthTicks = VarInt::readUnsignedInt($in);
         $pk->xboxUserId = CodecHelper::readString($in);
         $pk->platformChatId = CodecHelper::readString($in);
-        $pk->flags = $this->readFlags($in);
+        $pk->flags = $codec->read(EmoteFlags::class, $in);
         return $pk;
     }
 
@@ -35,14 +34,6 @@ class EmoteCodec implements Codec{
         VarInt::writeUnsignedInt($out, $pk->emoteLengthTicks);
         CodecHelper::writeString($out, $pk->xboxUserId);
         CodecHelper::writeString($out, $pk->platformChatId);
-        $this->writeFlags($out, $pk->flags);
-    }
-
-    protected function readFlags(ByteBufferReader $in) : EmoteFlags{
-        return EmoteFlags::fromInt(Byte::readUnsigned($in));
-    }
-
-    protected function writeFlags(ByteBufferWriter $out, EmoteFlags $flags) : void{
-        Byte::writeUnsigned($out, $flags->toInt());
+        $codec->write(EmoteFlags::class, $out, $pk->flags);
     }
 }

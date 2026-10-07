@@ -71,6 +71,7 @@ enum PlayerAuthInputFlag : int{
     case SNEAK_RELEASED_RAW = 62;
     case SNEAK_PRESSED_RAW = 63;
     case SNEAK_CURRENT_RAW = 64;
+    case INTERNAL_UPDATE = 65;
 
-    case NUMBER_OF_FLAGS = 65;
+    case NUMBER_OF_FLAGS = 66;
 }

@@ -17,23 +17,12 @@ class ServerStoreInfoCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : ServerStoreInfoPacket{
         $pk = new ServerStoreInfoPacket();
-        $pk->clientStoreEntrypointConfig = CodecHelper::readOptional($in, $this->readClientStoreEntrypointConfig(...));
+        $pk->clientStoreEntrypointConfig = CodecHelper::readOptional($in, fn($i) => $codec->read(ClientStoreEntrypointConfig::class, $i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ServerStoreInfoPacket);
-        CodecHelper::writeOptional($out, $pk->clientStoreEntrypointConfig, $this->writeClientStoreEntrypointConfig(...));
-    }
-
-    protected function readClientStoreEntrypointConfig(ByteBufferReader $in) : ClientStoreEntrypointConfig{
-        $id = CodecHelper::readString($in);
-        $name = CodecHelper::readString($in);
-        return new ClientStoreEntrypointConfig($id, $name);
-    }
-
-    protected function writeClientStoreEntrypointConfig(ByteBufferWriter $out, ClientStoreEntrypointConfig $data) : void{
-        CodecHelper::writeString($out, $data->id);
-        CodecHelper::writeString($out, $data->name);
+        CodecHelper::writeOptional($out, $pk->clientStoreEntrypointConfig, fn($o, $v) => $codec->write(ClientStoreEntrypointConfig::class, $o, $v));
     }
 }

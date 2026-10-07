@@ -7,6 +7,10 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\BlockPaletteEntry;
+use Nicholass003\Axiom\Data\Type\LevelSettingsData;
+use Nicholass003\Axiom\Data\Type\NetworkPermissionsData;
+use Nicholass003\Axiom\Data\Type\PlayerMovementSettingsData;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\StartGamePacket;
 use pmmp\encoding\ByteBufferReader;
@@ -27,19 +31,19 @@ class StartGameCodec implements Codec{
         $pk->pitch = LE::readFloat($in);
         $pk->yaw = LE::readFloat($in);
 
-        $pk->levelSettings = $codec->levelSettings()->read($in);
+        $pk->levelSettings = $codec->read(LevelSettingsData::class, $in);
 
         $pk->levelId = CodecHelper::readString($in);
         $pk->worldName = CodecHelper::readString($in);
         $pk->premiumWorldTemplateId = CodecHelper::readString($in);
         $pk->isTrial = CodecHelper::readBool($in);
 
-        $pk->movement = $codec->movementSettings()->read($in);
+        $pk->movement = $codec->read(PlayerMovementSettingsData::class, $in);
 
         $pk->currentTick = LE::readUnsignedLong($in);
         $pk->enchantmentSeed = VarInt::readSignedInt($in);
 
-        $pk->blockPalette = $codec->blockPalette()->read($in);
+        $pk->blockPalette = $codec->read(BlockPaletteEntry::class, $in);
 
         $pk->multiplayerCorrelationId = CodecHelper::readString($in);
         $pk->enableNewInventorySystem = CodecHelper::readBool($in);
@@ -55,7 +59,7 @@ class StartGameCodec implements Codec{
         $pk->blockNetworkIdsAreHashes = CodecHelper::readBool($in);
         $pk->enableTickDeathSystems = CodecHelper::readBool($in);
 
-        $pk->networkPermissions = $codec->networkPermissions()->read($in);
+        $pk->networkPermissions = $codec->read(NetworkPermissionsData::class, $in);
 
         return $pk;
     }
@@ -72,19 +76,19 @@ class StartGameCodec implements Codec{
         LE::writeFloat($out, $pk->pitch);
         LE::writeFloat($out, $pk->yaw);
 
-        $codec->levelSettings()->write($out, $pk->levelSettings);
+        $codec->write(LevelSettingsData::class, $out, $pk->levelSettings);
 
         CodecHelper::writeString($out, $pk->levelId);
         CodecHelper::writeString($out, $pk->worldName);
         CodecHelper::writeString($out, $pk->premiumWorldTemplateId);
         CodecHelper::writeBool($out, $pk->isTrial);
 
-        $codec->movementSettings()->write($out, $pk->movement);
+        $codec->write(PlayerMovementSettingsData::class, $out, $pk->movement);
 
         LE::writeUnsignedLong($out, $pk->currentTick);
         VarInt::writeSignedInt($out, $pk->enchantmentSeed);
 
-        $codec->blockPalette()->write($out, $pk->blockPalette);
+        $codec->write(BlockPaletteEntry::class, $out, $pk->blockPalette);
 
         CodecHelper::writeString($out, $pk->multiplayerCorrelationId);
         CodecHelper::writeBool($out, $pk->enableNewInventorySystem);
@@ -100,6 +104,6 @@ class StartGameCodec implements Codec{
         CodecHelper::writeBool($out, $pk->blockNetworkIdsAreHashes);
         CodecHelper::writeBool($out, $pk->enableTickDeathSystems);
 
-        $codec->networkPermissions()->write($out, $pk->networkPermissions);
+        $codec->write(NetworkPermissionsData::class, $out, $pk->networkPermissions);
     }
 }

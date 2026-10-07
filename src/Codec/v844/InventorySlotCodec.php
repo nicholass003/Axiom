@@ -23,9 +23,9 @@ class InventorySlotCodec implements Codec{
         $pk = new InventorySlotPacket();
         $pk->windowId = VarInt::readUnsignedInt($in);
         $pk->inventorySlot = VarInt::readUnsignedInt($in);
-        $pk->containerName = $codec->inventory()->container()->read($in);
-        $pk->storage = CodecHelper::readItemStackWrapper($in);
-        $pk->item = CodecHelper::readItemStackWrapper($in);
+        $pk->containerName = $codec->read(FullContainerName::class, $in);
+        $pk->storage = $codec->read(ItemStackWrapper::class, $in);
+        $pk->item = $codec->read(ItemStackWrapper::class, $in);
         return $pk;
     }
 
@@ -33,8 +33,8 @@ class InventorySlotCodec implements Codec{
         assert($pk instanceof InventorySlotPacket);
         VarInt::writeUnsignedInt($out, $pk->windowId);
         VarInt::writeUnsignedInt($out, $pk->inventorySlot);
-        $codec->inventory()->container()->write($out, $pk->containerName ?? new FullContainerName(ContainerIds::NONE->value));
-        CodecHelper::writeItemStackWrapper($out, $pk->storage ?? new ItemStackWrapper(0, new ItemStack(0, 0, 0, 0, '')));
-        CodecHelper::writeItemStackWrapper($out, $pk->item);
+        $codec->write(FullContainerName::class, $out, $pk->containerName ?? new FullContainerName(ContainerIds::NONE->value));
+        $codec->write(ItemStackWrapper::class, $out, $pk->storage ?? new ItemStackWrapper(0, new ItemStack(0, 0, 0, 0, '')));
+        $codec->write(ItemStackWrapper::class, $out, $pk->item);
     }
 }

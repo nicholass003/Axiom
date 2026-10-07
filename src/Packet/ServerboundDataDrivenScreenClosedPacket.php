@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Packet;
 
 use Nicholass003\Axiom\Data\PacketRecipient;
+use Nicholass003\Axiom\Enum\ScreenCloseReason;
 
 class ServerboundDataDrivenScreenClosedPacket implements Packet{
 
@@ -12,5 +13,5 @@ class ServerboundDataDrivenScreenClosedPacket implements Packet{
     public const RECIPIENT = PacketRecipient::SERVER;
 
     public int $formId = 0;
-    public string $closeReason = '';
+    public ScreenCloseReason $closeReason = ScreenCloseReason::CLIENT_CANCELED;
 }

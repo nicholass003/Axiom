@@ -6,7 +6,6 @@ namespace Nicholass003\Axiom\Version\Protocol;
 
 use Nicholass003\Axiom\Codec\CodecBuilder;
 use Nicholass003\Axiom\Codec\CodecType;
-use Nicholass003\Axiom\Codec\Common\Serializer\InventorySerializer;
 use Nicholass003\Axiom\Codec\v1001\BossEventCodec;
 use Nicholass003\Axiom\Codec\v1001\ClientboundUpdateSoundDataCodec;
 use Nicholass003\Axiom\Codec\v1001\GraphicsOverrideParameterCodec;
@@ -18,11 +17,24 @@ use Nicholass003\Axiom\Codec\v1001\PartyDestinationCookieResponseCodec;
 use Nicholass003\Axiom\Codec\v1001\SendPartyDestinationCookieCodec;
 use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\InventoryTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\NetworkInventoryActionSerializer;
-use Nicholass003\Axiom\Codec\v1001\Serializer\LevelSettingsSerializer;
+use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\ReleaseItemTransactionDataSerializer;
+use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\UseItemOnEntityTransactionDataSerializer;
+use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\UseItemTransactionDataSerializer;
+use Nicholass003\Axiom\Codec\v1001\Serializer\LevelSettingsDataSerializer;
+use Nicholass003\Axiom\Codec\v1001\Serializer\PresenceConfigSerializer;
+use Nicholass003\Axiom\Codec\v1001\Serializer\WhiskerScopeDataSummarySerializer;
 use Nicholass003\Axiom\Codec\v1001\ServerboundDiagnosticsCodec;
 use Nicholass003\Axiom\Codec\v1001\ServerPresenceInfoCodec;
 use Nicholass003\Axiom\Codec\v1001\StartGameCodec;
 use Nicholass003\Axiom\Codec\v1001\SubChunkRequestCodec;
+use Nicholass003\Axiom\Data\Type\Inventory\NetworkInventoryAction;
+use Nicholass003\Axiom\Data\Type\Inventory\ReleaseItemTransactionData;
+use Nicholass003\Axiom\Data\Type\Inventory\TransactionData;
+use Nicholass003\Axiom\Data\Type\Inventory\UseItemOnEntityTransactionData;
+use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
+use Nicholass003\Axiom\Data\Type\LevelSettingsData;
+use Nicholass003\Axiom\Data\Type\PresenceConfig;
+use Nicholass003\Axiom\Data\Type\WhiskerScopeDataSummary;
 use Nicholass003\Axiom\Packet\BossEventPacket;
 use Nicholass003\Axiom\Packet\ClientboundUpdateSoundDataPacket;
 use Nicholass003\Axiom\Packet\GraphicsOverrideParameterPacket;
@@ -36,35 +48,26 @@ use Nicholass003\Axiom\Packet\ServerboundDiagnosticsPacket;
 use Nicholass003\Axiom\Packet\ServerPresenceInfoPacket;
 use Nicholass003\Axiom\Packet\StartGamePacket;
 use Nicholass003\Axiom\Packet\SubChunkRequestPacket;
+use Nicholass003\Axiom\Version\MinecraftVersionNetwork;
 use Nicholass003\Axiom\Version\ProtocolVersion;
 
 class Protocol1001 implements ProtocolInterface{
 
     public static function buildCodecType() : CodecType{
-        $codecType = Protocol975::buildCodecType()->fork();
-        $inventoryAction = new NetworkInventoryActionSerializer();
-        $inventoryTransaction = new InventoryTransactionDataSerializer(
-            $inventoryAction
-        );
-        $inventory = new InventorySerializer(
-            $codecType->inventory()->request(),
-            $codecType->inventory()->response(),
-            $codecType->inventory()->container(),
-            $inventoryAction,
-            $inventoryTransaction,
-            $codecType->inventory()->itemInteraction()
-        );
-        $levelSettings = new LevelSettingsSerializer(
-            $codecType->levelSettings()->experiments(),
-            $codecType->levelSettings()->gameRules()
-        );
-        return $codecType
-            ->withInventory($inventory)
-            ->withLevelSettings($levelSettings);
+        $codec = Protocol975::buildCodecType()->fork();
+        $codec->override(PresenceConfig::class, new PresenceConfigSerializer());
+        $codec->override(LevelSettingsData::class, new LevelSettingsDataSerializer());
+        $codec->override(TransactionData::class, new InventoryTransactionDataSerializer());
+        $codec->override(NetworkInventoryAction::class, new NetworkInventoryActionSerializer());
+        $codec->override(ReleaseItemTransactionData::class, new ReleaseItemTransactionDataSerializer());
+        $codec->override(UseItemOnEntityTransactionData::class, new UseItemOnEntityTransactionDataSerializer());
+        $codec->override(UseItemTransactionData::class, new UseItemTransactionDataSerializer());
+        $codec->override(WhiskerScopeDataSummary::class, new WhiskerScopeDataSummarySerializer());
+        return $codec;
     }
 
-    public static function build() : CodecBuilder{
-        return Protocol975::build()->fork(ProtocolVersion::v1001, "1.26.30")
+    public static function build(?MinecraftVersionNetwork $mc = null) : CodecBuilder{
+        return Protocol975::build()->fork(ProtocolVersion::v1001, $mc?->__toString() ?? "1.26.30")
             ->register(ClientboundUpdateSoundDataPacket::ID, new ClientboundUpdateSoundDataCodec())
             ->register(SendPartyDestinationCookiePacket::ID, new SendPartyDestinationCookieCodec())
             ->register(PartyDestinationCookieResponsePacket::ID, new PartyDestinationCookieResponseCodec())

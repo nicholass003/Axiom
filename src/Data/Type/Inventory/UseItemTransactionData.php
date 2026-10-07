@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Data\Type\Inventory;
 use Nicholass003\Axiom\Data\Type\BlockPosition;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\Vec3;
+use Nicholass003\Axiom\Enum\HandSlot;
 use Nicholass003\Axiom\Enum\PredictedResult;
 use Nicholass003\Axiom\Enum\TriggerType;
 
@@ -24,7 +25,10 @@ final class UseItemTransactionData implements TransactionData{
         public readonly BlockPosition $blockPosition,
         public readonly int $face,
         public readonly int $hotbarSlot,
-        public readonly ItemStackWrapper $itemInHand,
+        /** @since v2193 */
+        public readonly HandSlot $hand,
+        /** @since v2193 */
+        public readonly ?ItemStackWrapper $itemInHand,
         public readonly Vec3 $playerPosition,
         public readonly Vec3 $clickPosition,
         public readonly int $blockRuntimeId,

@@ -7,8 +7,10 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPacketEntryCommon;
 use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPacketEntryWithCache;
 use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPacketEntryWithoutCache;
+use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPosition;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\SubChunkPacket;
 use pmmp\encoding\ByteBufferReader;
@@ -23,11 +25,11 @@ class SubChunkCodec implements Codec{
         $cacheEnabled = CodecHelper::readBool($in);
         $pk->cacheEnabled = $cacheEnabled;
         $pk->dimension = VarInt::readSignedInt($in);
-        $pk->baseSubChunkPosition = CodecHelper::readSubChunk($in);
+        $pk->baseSubChunkPosition = $codec->read(SubChunkPosition::class, $in);
 
         $count = LE::readUnsignedInt($in);
         for($i = 0; $i < $count; ++$i){
-            $common = $codec->subChunk()->entryCommon()->read($in, $cacheEnabled);
+            $common = $codec->get(SubChunkPacketEntryCommon::class)->read($in, $codec, $cacheEnabled);
             if($cacheEnabled){
                 $hash = LE::readUnsignedLong($in);
                 $pk->entries[] = new SubChunkPacketEntryWithCache($common, $hash);
@@ -43,15 +45,15 @@ class SubChunkCodec implements Codec{
         assert($pk instanceof SubChunkPacket);
         CodecHelper::writeBool($out, $pk->cacheEnabled);
         VarInt::writeSignedInt($out, $pk->dimension);
-        CodecHelper::writeSubChunk($out, $pk->baseSubChunkPosition);
+        $codec->write(SubChunkPosition::class, $out, $pk->baseSubChunkPosition);
 
         LE::writeUnsignedInt($out, count($pk->entries));
         foreach($pk->entries as $entry){
             if($entry instanceof SubChunkPacketEntryWithCache){
-                $codec->subChunk()->entryCommon()->write($out, $entry->base, true);
+                $codec->get(SubChunkPacketEntryCommon::class)->write($out, $entry->base, $codec, true);
                 LE::writeUnsignedLong($out, $entry->usedBlobHash);
             }else{
-                $codec->subChunk()->entryCommon()->write($out, $entry->base, false);
+                $codec->get(SubChunkPacketEntryCommon::class)->write($out, $entry->base, $codec, false);
             }
         }
     }

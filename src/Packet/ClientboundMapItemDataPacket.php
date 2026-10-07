@@ -25,10 +25,10 @@ class ClientboundMapItemDataPacket implements Packet{
     public array $parentMapIds = [];
     public ?int $scale = null;
     /** @var list<MapTrackedObject> */
-    public array $trackedEntities = [];
+    public ?array $trackedEntities = null;
     /** @var list<MapDecoration> */
-    public array $decorations = [];
-    public int $xOffset = 0;
-    public int $yOffset = 0;
+    public ?array $decorations = null;
+    public ?int $xOffset = null;
+    public ?int $yOffset = null;
     public ?MapImage $colors = null;
 }

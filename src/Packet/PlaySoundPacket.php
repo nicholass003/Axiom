@@ -18,4 +18,10 @@ class PlaySoundPacket implements Packet{
     public float $pitch;
     /** @since v975 */
     public ?int $serverSoundHandle = null;
+    /** @since v2168 */
+    public int $loopCount = 0;
+    /** @since v2193 */
+    public bool $bypassListenerRangeCheck = false;
+    /** @since v2193 */
+    public ?float $playbackPositionSeconds = null;
 }

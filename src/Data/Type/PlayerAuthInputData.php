@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Data\Type;
 
 use Nicholass003\Axiom\Codec\Common\BitSet;
+use Nicholass003\Axiom\Enum\InputMode;
+use Nicholass003\Axiom\Enum\PlayMode;
 use Nicholass003\Axiom\Data\Type\Inventory\StackRequest\ItemStackRequest;
 
 class PlayerAuthInputData{
@@ -20,8 +22,8 @@ class PlayerAuthInputData{
         public readonly float $moveVecX,
         public readonly float $moveVecZ,
         public readonly BitSet $inputFlags,
-        public readonly int $inputMode,
-        public readonly int $playMode,
+        public readonly InputMode $inputMode,
+        public readonly PlayMode $playMode,
         public readonly int $interactionMode,
         public readonly Vec2 $interactRotation,
         public readonly int $tick,

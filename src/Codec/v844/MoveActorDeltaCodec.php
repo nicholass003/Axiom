@@ -21,22 +21,23 @@ class MoveActorDeltaCodec implements Codec{
         $pk->actorRuntimeId = CodecHelper::readActorRuntimeId($in);
         $pk->flags = LE::readUnsignedShort($in);
 
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_X)){
+        $flags = $pk->flags;
+        if(($flags & MoveActorDeltaFlag::HAS_X->value) !== 0){
             $pk->xPos = LE::readFloat($in);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_Y)){
+        if(($flags & MoveActorDeltaFlag::HAS_Y->value) !== 0){
             $pk->yPos = LE::readFloat($in);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_Z)){
+        if(($flags & MoveActorDeltaFlag::HAS_Z->value) !== 0){
             $pk->zPos = LE::readFloat($in);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_PITCH)){
+        if(($flags & MoveActorDeltaFlag::HAS_PITCH->value) !== 0){
             $pk->pitch = CodecHelper::readRotationByte($in);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_YAW)){
+        if(($flags & MoveActorDeltaFlag::HAS_YAW->value) !== 0){
             $pk->yaw = CodecHelper::readRotationByte($in);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_HEAD_YAW)){
+        if(($flags & MoveActorDeltaFlag::HAS_HEAD_YAW->value) !== 0){
             $pk->headYaw = CodecHelper::readRotationByte($in);
         }
 
@@ -48,27 +49,24 @@ class MoveActorDeltaCodec implements Codec{
         CodecHelper::writeActorRuntimeId($out, $pk->actorRuntimeId);
         LE::writeUnsignedShort($out, $pk->flags);
 
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_X)){
-            LE::writeFloat($out, $pk->xPos);
+        $flags = $pk->flags;
+        if(($flags & MoveActorDeltaFlag::HAS_X->value) !== 0){
+            LE::writeFloat($out, $pk->xPos ?? 0.0);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_Y)){
-            LE::writeFloat($out, $pk->yPos);
+        if(($flags & MoveActorDeltaFlag::HAS_Y->value) !== 0){
+            LE::writeFloat($out, $pk->yPos ?? 0.0);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_Z)){
-            LE::writeFloat($out, $pk->zPos);
+        if(($flags & MoveActorDeltaFlag::HAS_Z->value) !== 0){
+            LE::writeFloat($out, $pk->zPos ?? 0.0);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_PITCH)){
-            CodecHelper::writeRotationByte($out, $pk->pitch);
+        if(($flags & MoveActorDeltaFlag::HAS_PITCH->value) !== 0){
+            CodecHelper::writeRotationByte($out, $pk->pitch ?? 0.0);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_YAW)){
-            CodecHelper::writeRotationByte($out, $pk->yaw);
+        if(($flags & MoveActorDeltaFlag::HAS_YAW->value) !== 0){
+            CodecHelper::writeRotationByte($out, $pk->yaw ?? 0.0);
         }
-        if($this->hasFlag($pk->flags, MoveActorDeltaFlag::HAS_HEAD_YAW)){
-            CodecHelper::writeRotationByte($out, $pk->headYaw);
+        if(($flags & MoveActorDeltaFlag::HAS_HEAD_YAW->value) !== 0){
+            CodecHelper::writeRotationByte($out, $pk->headYaw ?? 0.0);
         }
-    }
-
-    private function hasFlag(int $flags, MoveActorDeltaFlag $flag) : bool{
-        return ($flags & $flag->value) !== 0;
     }
 }

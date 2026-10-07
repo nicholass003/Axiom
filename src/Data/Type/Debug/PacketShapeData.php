@@ -23,5 +23,6 @@ class PacketShapeData{
         public readonly ?float $arrowHeadLength,
         public readonly ?float $arrowHeadRadius,
         public readonly ?int $segments,
+        public readonly int $dimensionId = 0,
     ){}
 }

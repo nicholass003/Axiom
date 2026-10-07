@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Nicholass003\Axiom\Data\Type;
 
 use Nicholass003\Axiom\Data\Type\Skin\SkinData;
+use Nicholass003\Axiom\Enum\PlayerListType;
 
 class PlayerListEntry{
+
+    /** @since v2168 */
+    public readonly PlayerListType $type;
 
     public function __construct(
         public readonly string $uuid,
@@ -20,6 +24,9 @@ class PlayerListEntry{
         public readonly ?bool $isHost = null,
         public readonly ?bool $isSubClient = null,
         public readonly ?int $color = null,
-        public readonly ?bool $skinVerified = null
-    ){}
+        public readonly ?bool $skinVerified = null,
+        PlayerListType $type = PlayerListType::REMOVE
+    ){
+        $this->type = $type;
+    }
 }

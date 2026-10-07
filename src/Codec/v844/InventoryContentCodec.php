@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Inventory\FullContainerName;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Packet\InventoryContentPacket;
 use Nicholass003\Axiom\Packet\Packet;
@@ -19,33 +20,17 @@ class InventoryContentCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : InventoryContentPacket{
         $pk = new InventoryContentPacket();
         $pk->windowId = VarInt::readUnsignedInt($in);
-        $pk->items = $this->readItemStackWrappers($in);
-        $pk->containerName = $codec->inventory()->container()->read($in);
-        $pk->storage = CodecHelper::readItemStackWrapper($in);
+        $pk->items = CodecHelper::readList($in, fn($i) => $codec->read(ItemStackWrapper::class, $i));
+        $pk->containerName = $codec->read(FullContainerName::class, $in);
+        $pk->storage = $codec->read(ItemStackWrapper::class, $in);
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof InventoryContentPacket);
         VarInt::writeUnsignedInt($out, $pk->windowId);
-        $this->writeItemStackWrappers($out, $pk->items);
-        $codec->inventory()->container()->write($out, $pk->containerName);
-        CodecHelper::writeItemStackWrapper($out, $pk->storage);
-    }
-
-    /**
-     * @return list<ItemStackWrapper>
-     */
-    protected function readItemStackWrappers(ByteBufferReader $in) : array{
-        return CodecHelper::readList($in, fn(ByteBufferReader $in) : ItemStackWrapper => CodecHelper::readItemStackWrapper($in));
-    }
-
-    /**
-     * @param list<ItemStackWrapper> $items
-     */
-    protected function writeItemStackWrappers(ByteBufferWriter $out, array $items) : void{
-        CodecHelper::writeList($out, $items, function(ByteBufferWriter $out, ItemStackWrapper $item) : void{
-            CodecHelper::writeItemStackWrapper($out, $item);
-        });
+        CodecHelper::writeList($out, $pk->items, fn($o, $v) => $codec->write(ItemStackWrapper::class, $o, $v));
+        $codec->write(FullContainerName::class, $out, $pk->containerName);
+        $codec->write(ItemStackWrapper::class, $out, $pk->storage);
     }
 }

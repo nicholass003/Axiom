@@ -16,12 +16,12 @@ class PurchaseReceiptCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : PurchaseReceiptPacket{
         $pk = new PurchaseReceiptPacket();
-        $pk->entries = CodecHelper::readList($in, fn($in) => CodecHelper::readString($in));
+        $pk->entries = CodecHelper::readList($in, fn($i) => CodecHelper::readString($i));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof PurchaseReceiptPacket);
-        CodecHelper::writeList($out, $pk->entries, fn($out, $s) => CodecHelper::writeString($out, $s));
+        CodecHelper::writeList($out, $pk->entries, fn($o, $v) => CodecHelper::writeString($o, $v));
     }
 }

@@ -10,6 +10,8 @@ enum PackSettingType : int{
     case FLOAT = 0;
     case BOOL = 1;
     case STRING = 2;
+    /** @since v2193 */
+    case STRING_ARRAY = 3;
 
     public static function safe(int $value) : self{
         return self::tryFrom($value) ?? self::UNKNOWN;

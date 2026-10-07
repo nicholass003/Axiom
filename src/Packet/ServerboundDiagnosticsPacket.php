@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Packet;
 use Nicholass003\Axiom\Data\PacketRecipient;
 use Nicholass003\Axiom\Data\Type\EntityDiagnosticTimingInfo;
 use Nicholass003\Axiom\Data\Type\MemoryCategoryCounter;
+use Nicholass003\Axiom\Data\Type\SystemCategory;
 use Nicholass003\Axiom\Data\Type\SystemDiagnosticTimingInfo;
 use Nicholass003\Axiom\Data\Type\WhiskerScopeDataSummary;
 
@@ -25,22 +26,27 @@ class ServerboundDiagnosticsPacket implements Packet{
     public float $avgRemainderTimePercent;
     public float $avgUnaccountedTimePercent;
 
-    /** 
+    /**
      * @since v924
      * @var list<MemoryCategoryCounter>
      */
     public array $memoryCategoryValues = [];
-    /** 
+    /**
      * @since v975
      * @var list<EntityDiagnosticTimingInfo>
      */
     public array $entityDiagnostics = [];
-    /** 
+    /**
      * @since v975
      * @var list<SystemDiagnosticTimingInfo>
      */
     public array $systemDiagnostics = [];
-    /** 
+    /**
+     * @since v2168
+     * @var list<SystemCategory>
+     */
+    public array $systemCategories = [];
+    /**
      * @since v1001
      * @var list<WhiskerScopeDataSummary>
      */

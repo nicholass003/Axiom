@@ -7,6 +7,9 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
+use Nicholass003\Axiom\Data\Type\MetadataEntry;
+use Nicholass003\Axiom\Data\Type\PropertySyncData;
 use Nicholass003\Axiom\Packet\AddPlayerPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
@@ -27,10 +30,10 @@ class AddPlayerCodec implements Codec{
         $pk->pitch = LE::readFloat($in);
         $pk->yaw = LE::readFloat($in);
         $pk->headYaw = LE::readFloat($in);
-        $pk->item = CodecHelper::readItemStackWrapper($in);
+        $pk->item = $codec->read(ItemStackWrapper::class, $in);
         $pk->gameMode = VarInt::readSignedInt($in);
-        $pk->metadata = $codec->entityMetadata()->read($in);
-        $pk->syncedProperties = $codec->propertySync()->read($in);
+        $pk->metadata = CodecHelper::readList($in, fn($i) => $codec->read(MetadataEntry::class, $i));
+        $pk->syncedProperties = $codec->read(PropertySyncData::class, $in);
 
         $abilitiesCodec = new UpdateAbilitiesCodec();
         $pk->abilitiesPacket = $abilitiesCodec->decode($in, $codec);
@@ -56,10 +59,10 @@ class AddPlayerCodec implements Codec{
         LE::writeFloat($out, $pk->pitch);
         LE::writeFloat($out, $pk->yaw);
         LE::writeFloat($out, $pk->headYaw);
-        CodecHelper::writeItemStackWrapper($out, $pk->item);
+        $codec->write(ItemStackWrapper::class, $out, $pk->item);
         VarInt::writeSignedInt($out, $pk->gameMode);
-        $codec->entityMetadata()->write($out, $pk->metadata);
-        $codec->propertySync()->write($out, $pk->syncedProperties);
+        CodecHelper::writeList($out, $pk->metadata, fn($o, $v) => $codec->write(MetadataEntry::class, $o, $v));
+        $codec->write(PropertySyncData::class, $out, $pk->syncedProperties);
 
         $abilitiesCodec = new UpdateAbilitiesCodec();
         $abilitiesCodec->encode($out, $pk->abilitiesPacket, $codec);

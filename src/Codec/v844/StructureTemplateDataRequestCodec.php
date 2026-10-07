@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\Structure\StructureSettings;
 use Nicholass003\Axiom\Enum\StructureTemplateRequestType;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\StructureTemplateDataRequestPacket;
@@ -20,7 +21,7 @@ class StructureTemplateDataRequestCodec implements Codec{
         $pk = new StructureTemplateDataRequestPacket();
         $pk->structureTemplateName = CodecHelper::readString($in);
         $pk->structureBlockPosition = CodecHelper::readBlockPosition($in);
-        $pk->structureSettings = $codec->structure()->settings()->read($in);
+        $pk->structureSettings = $codec->read(StructureSettings::class, $in);
         $pk->requestType = StructureTemplateRequestType::safe(Byte::readUnsigned($in));
         return $pk;
     }
@@ -29,7 +30,7 @@ class StructureTemplateDataRequestCodec implements Codec{
         assert($pk instanceof StructureTemplateDataRequestPacket);
         CodecHelper::writeString($out, $pk->structureTemplateName);
         CodecHelper::writeBlockPosition($out, $pk->structureBlockPosition);
-        $codec->structure()->settings()->write($out, $pk->structureSettings);
+        $codec->write(StructureSettings::class, $out, $pk->structureSettings);
         Byte::writeUnsigned($out, $pk->requestType->value);
     }
 }

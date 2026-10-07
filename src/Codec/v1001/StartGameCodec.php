@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Nicholass003\Axiom\Codec\v1001;
 
+use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
-use Nicholass003\Axiom\Codec\v944\StartGameCodec as V944StartGameCodec;
+use Nicholass003\Axiom\Data\Type\BlockPaletteEntry;
+use Nicholass003\Axiom\Data\Type\LevelSettingsData;
+use Nicholass003\Axiom\Data\Type\NetworkPermissionsData;
+use Nicholass003\Axiom\Data\Type\PlayerMovementSettingsData;
 use Nicholass003\Axiom\Data\Type\PresenceConfig;
+use Nicholass003\Axiom\Data\Type\ServerJoinInformation;
 use Nicholass003\Axiom\Data\Type\ServerTelemetryData;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\StartGamePacket;
@@ -16,7 +21,7 @@ use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
-class StartGameCodec extends V944StartGameCodec{
+class StartGameCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : StartGamePacket{
         $pk = new StartGamePacket();
@@ -29,19 +34,19 @@ class StartGameCodec extends V944StartGameCodec{
         $pk->pitch = LE::readFloat($in);
         $pk->yaw = LE::readFloat($in);
 
-        $pk->levelSettings = $codec->levelSettings()->read($in);
+        $pk->levelSettings = $codec->read(LevelSettingsData::class, $in);
 
         $pk->levelId = CodecHelper::readString($in);
         $pk->worldName = CodecHelper::readString($in);
         $pk->premiumWorldTemplateId = CodecHelper::readString($in);
         $pk->isTrial = CodecHelper::readBool($in);
 
-        $pk->movement = $codec->movementSettings()->read($in);
+        $pk->movement = $codec->read(PlayerMovementSettingsData::class, $in);
 
         $pk->currentTick = LE::readUnsignedLong($in);
         $pk->enchantmentSeed = VarInt::readSignedInt($in);
 
-        $pk->blockPalette = $codec->blockPalette()->read($in);
+        $pk->blockPalette = CodecHelper::readList($in, fn($i) => $codec->read(BlockPaletteEntry::class, $i));
 
         $pk->multiplayerCorrelationId = CodecHelper::readString($in);
         $pk->enableNewInventorySystem = CodecHelper::readBool($in);
@@ -56,12 +61,12 @@ class StartGameCodec extends V944StartGameCodec{
         $pk->enableClientSideChunkGeneration = CodecHelper::readBool($in);
         $pk->blockNetworkIdsAreHashes = CodecHelper::readBool($in);
 
-        $pk->networkPermissions = $codec->networkPermissions()->read($in);
+        $pk->networkPermissions = $codec->read(NetworkPermissionsData::class, $in);
 
         $pk->isLoggingChat = CodecHelper::readBool($in);
 
-        $pk->serverJoinInformation = CodecHelper::readOptional($in, $this->readServerJoinInfo(...));
-        $pk->serverTelemetryData = $this->readServerTelementryData($in);
+        $pk->serverJoinInformation = CodecHelper::readOptional($in, fn($i) => $codec->read(ServerJoinInformation::class, $i));
+        $pk->serverTelemetryData = $codec->read(ServerTelemetryData::class, $in);
 
         return $pk;
     }
@@ -78,19 +83,19 @@ class StartGameCodec extends V944StartGameCodec{
         LE::writeFloat($out, $pk->pitch);
         LE::writeFloat($out, $pk->yaw);
 
-        $codec->levelSettings()->write($out, $pk->levelSettings);
+        $codec->write(LevelSettingsData::class, $out, $pk->levelSettings);
 
         CodecHelper::writeString($out, $pk->levelId);
         CodecHelper::writeString($out, $pk->worldName);
         CodecHelper::writeString($out, $pk->premiumWorldTemplateId);
         CodecHelper::writeBool($out, $pk->isTrial);
 
-        $codec->movementSettings()->write($out, $pk->movement);
+        $codec->write(PlayerMovementSettingsData::class, $out, $pk->movement);
 
         LE::writeUnsignedLong($out, $pk->currentTick);
         VarInt::writeSignedInt($out, $pk->enchantmentSeed);
 
-        $codec->blockPalette()->write($out, $pk->blockPalette);
+        CodecHelper::writeList($out, $pk->blockPalette, fn($o, $v) => $codec->write(BlockPaletteEntry::class, $o, $v));
 
         CodecHelper::writeString($out, $pk->multiplayerCorrelationId);
         CodecHelper::writeBool($out, $pk->enableNewInventorySystem);
@@ -105,24 +110,11 @@ class StartGameCodec extends V944StartGameCodec{
         CodecHelper::writeBool($out, $pk->enableClientSideChunkGeneration);
         CodecHelper::writeBool($out, $pk->blockNetworkIdsAreHashes);
 
-        $codec->networkPermissions()->write($out, $pk->networkPermissions);
+        $codec->write(NetworkPermissionsData::class, $out, $pk->networkPermissions);
 
         CodecHelper::writeBool($out, $pk->isLoggingChat);
 
-        CodecHelper::writeOptional($out, $pk->serverJoinInformation, $this->writeServerJoinInfo(...));
-        $this->writeServerTelementryData($out, $pk->serverTelemetryData ?? new ServerTelemetryData('', '', '', ''));
-    }
-
-    protected function readPresenceConfig(ByteBufferReader $in) : PresenceConfig{
-        $experienceName = CodecHelper::readString($in);
-        $worldName = CodecHelper::readString($in);
-        $richPresenceId = CodecHelper::readString($in);
-        return new PresenceConfig($experienceName, $worldName, $richPresenceId);
-    }
-
-    protected function writePresenceConfig(ByteBufferWriter $out, PresenceConfig $data) : void{
-        CodecHelper::writeString($out, $data->experienceName);
-        CodecHelper::writeString($out, $data->worldName);
-        CodecHelper::writeString($out, $data->richPresenceId);
+        CodecHelper::writeOptional($out, $pk->serverJoinInformation, fn($o, $v) => $codec->write(ServerJoinInformation::class, $o, $v));
+        $codec->write(ServerTelemetryData::class, $out, $pk->serverTelemetryData ?? new ServerTelemetryData('', '', '', ''));
     }
 }

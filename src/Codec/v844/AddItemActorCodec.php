@@ -7,6 +7,8 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
+use Nicholass003\Axiom\Data\Type\MetadataEntry;
 use Nicholass003\Axiom\Packet\AddItemActorPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\ByteBufferReader;
@@ -18,10 +20,10 @@ class AddItemActorCodec implements Codec{
         $pk = new AddItemActorPacket();
         $pk->actorUniqueId = CodecHelper::readActorUniqueId($in);
         $pk->actorRuntimeId = CodecHelper::readActorRuntimeId($in);
-        $pk->item = CodecHelper::readItemStackWrapper($in);
+        $pk->item = $codec->read(ItemStackWrapper::class, $in);
         $pk->position = CodecHelper::readVec3($in);
         $pk->motion = CodecHelper::readVec3Nullable($in);
-        $pk->metadata = $codec->entityMetadata()->read($in);
+        $pk->metadata = CodecHelper::readList($in, fn($in) => $codec->read(MetadataEntry::class, $in));
         $pk->isFromFishing = CodecHelper::readBool($in);
         return $pk;
     }
@@ -30,10 +32,10 @@ class AddItemActorCodec implements Codec{
         assert($pk instanceof AddItemActorPacket);
         CodecHelper::writeActorUniqueId($out, $pk->actorUniqueId);
         CodecHelper::writeActorRuntimeId($out, $pk->actorRuntimeId);
-        CodecHelper::writeItemStackWrapper($out, $pk->item);
+        $codec->write(ItemStackWrapper::class, $out, $pk->item);
         CodecHelper::writeVec3($out, $pk->position);
         CodecHelper::writeVec3Nullable($out, $pk->motion);
-        $codec->entityMetadata()->write($out, $pk->metadata);
+        CodecHelper::writeList($out, $pk->metadata, fn($out, $v) => $codec->write(MetadataEntry::class, $out, $v));
         CodecHelper::writeBool($out, $pk->isFromFishing);
     }
 }

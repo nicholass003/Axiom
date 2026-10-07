@@ -13,6 +13,11 @@ class CameraPreset{
     public const AUDIO_LISTENER_TYPE_CAMERA = 0;
     public const AUDIO_LISTENER_TYPE_PLAYER = 1;
 
+    /** @since v2193 */
+    public readonly bool $applyInheritedStartingRotation;
+    /** @since v2193 */
+    public readonly ?Vec2 $startingRotation;
+
     public function __construct(
         public readonly string $name,
         public readonly string $parent,
@@ -35,6 +40,11 @@ class CameraPreset{
         public readonly ?int $audioListenerType,
         public readonly ?bool $playerEffects,
         public readonly ?CameraPresetAimAssist $aimAssist,
-        public readonly ?ControlScheme $controlScheme
-    ){}
+        public readonly ?ControlScheme $controlScheme,
+        bool $applyInheritedStartingRotation = false,
+        ?Vec2 $startingRotation = null
+    ){
+        $this->applyInheritedStartingRotation = $applyInheritedStartingRotation;
+        $this->startingRotation = $startingRotation;
+    }
 }

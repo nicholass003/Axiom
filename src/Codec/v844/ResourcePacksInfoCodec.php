@@ -27,7 +27,7 @@ class ResourcePacksInfoCodec implements Codec{
 
         $count = LE::readUnsignedShort($in);
         for($i = 0; $i < $count; ++$i){
-            $pk->resourcePackEntries[] = $this->readEntry($in);
+            $pk->resourcePackEntries[] = $codec->read(ResourcePackInfoEntry::class, $in);
         }
 
         return $pk;
@@ -44,35 +44,7 @@ class ResourcePacksInfoCodec implements Codec{
 
         LE::writeUnsignedShort($out, count($pk->resourcePackEntries));
         foreach($pk->resourcePackEntries as $entry){
-            $this->writeEntry($out, $entry);
+            $codec->write(ResourcePackInfoEntry::class, $out, $entry);
         }
-    }
-
-    protected function readEntry(ByteBufferReader $in) : ResourcePackInfoEntry{
-        return new ResourcePackInfoEntry(
-            CodecHelper::readUUID($in),
-            CodecHelper::readString($in),
-            LE::readUnsignedLong($in),
-            CodecHelper::readString($in),
-            CodecHelper::readString($in),
-            CodecHelper::readString($in),
-            CodecHelper::readBool($in),
-            CodecHelper::readBool($in),
-            CodecHelper::readBool($in),
-            CodecHelper::readString($in)
-        );
-    }
-
-    protected function writeEntry(ByteBufferWriter $out, ResourcePackInfoEntry $entry) : void{
-        CodecHelper::writeUUID($out, $entry->packId);
-        CodecHelper::writeString($out, $entry->version);
-        LE::writeUnsignedLong($out, $entry->sizeBytes);
-        CodecHelper::writeString($out, $entry->encryptionKey);
-        CodecHelper::writeString($out, $entry->subPackName);
-        CodecHelper::writeString($out, $entry->contentId);
-        CodecHelper::writeBool($out, $entry->hasScripts);
-        CodecHelper::writeBool($out, $entry->isAddonPack);
-        CodecHelper::writeBool($out, $entry->isRtxCapable);
-        CodecHelper::writeString($out, $entry->cdnUrl);
     }
 }

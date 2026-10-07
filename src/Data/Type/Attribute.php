@@ -14,7 +14,7 @@ class Attribute{
         public readonly float $min,
         public readonly float $max,
         public readonly float $current,
-        public readonly float $default,
+        public readonly float $default = 0.0,
         public readonly array $modifiers = []
     ){}
 }

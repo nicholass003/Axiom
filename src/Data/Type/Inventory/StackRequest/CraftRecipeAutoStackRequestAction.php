@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Nicholass003\Axiom\Data\Type\Inventory\StackRequest;
 
-use Nicholass003\Axiom\Enum\ItemStackRequestActionType;
-
 use Nicholass003\Axiom\Data\Type\Recipe\RecipeIngredient;
+
+use Nicholass003\Axiom\Enum\ItemStackRequestActionType;
 
 class CraftRecipeAutoStackRequestAction extends ItemStackRequestAction{
 

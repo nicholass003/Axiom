@@ -12,18 +12,28 @@ class CameraAimAssistCategory{
      */
     public readonly array $blockTags;
 
+    /** 
+     * @since v924
+     * @var int[] $entityTypeFamilies
+     */
+    public readonly array $entityTypeFamilies;
+
     /**
-     * @param list<CameraAimAssistCategoryEntityPriority> $entities
-     * @param list<CameraAimAssistCategoryBlockPriority>  $blocks
+     * @param list<CameraAimAssistCategoryPriority> $entities
+     * @param list<CameraAimAssistCategoryPriority> $blocks
+     * @param list<CameraAimAssistCategoryPriority> $blockTags
+     * @param list<CameraAimAssistCategoryPriority> $entityTypeFamilies
      */
     public function __construct(
         public readonly string $name,
         public readonly array $entities,
         public readonly array $blocks,
         array $blockTags = [],
+        array $entityTypeFamilies = [],
         public readonly ?int $defaultEntityPriority = null,
         public readonly ?int $defaultBlockPriority = null
     ){
         $this->blockTags = $blockTags;
+        $this->entityTypeFamilies = $entityTypeFamilies;
     }
 }

@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Enum;
 enum GameRuleType : int{
 
     case UNKNOWN = -1;
+    case NULL = 0;
     case BOOL = 1;
     case INT = 2;
     case FLOAT = 3;

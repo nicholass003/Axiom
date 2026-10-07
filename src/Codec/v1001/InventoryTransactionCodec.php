@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Data\Type\Inventory\InventoryTransactionChangedSlotsHack;
+use Nicholass003\Axiom\Data\Type\Inventory\TransactionData;
 use Nicholass003\Axiom\Packet\InventoryTransactionPacket;
 use Nicholass003\Axiom\Packet\Packet;
 use pmmp\encoding\Byte;
@@ -35,7 +36,7 @@ class InventoryTransactionCodec implements Codec{
 
         $pk->hasTransactionData = CodecHelper::readBool($in);
 
-        $pk->trData = $codec->inventory()->transaction()->read($in, $codec);
+        $pk->trData = $codec->read(TransactionData::class, $in);
 
         return $pk;
     }
@@ -55,6 +56,6 @@ class InventoryTransactionCodec implements Codec{
 
         CodecHelper::writeBool($out, true);
 
-        $codec->inventory()->transaction()->write($out, $pk->trData, $codec);
+        $codec->write(TransactionData::class, $out, $pk->trData);
     }
 }

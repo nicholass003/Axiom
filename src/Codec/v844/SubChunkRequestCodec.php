@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v844;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPosition;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\SubChunkRequestPacket;
 use pmmp\encoding\ByteBufferReader;
@@ -19,7 +20,7 @@ class SubChunkRequestCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : SubChunkRequestPacket{
         $pk = new SubChunkRequestPacket();
         $pk->dimension = VarInt::readSignedInt($in);
-        $pk->basePosition = CodecHelper::readSubChunk($in);
+        $pk->basePosition = $codec->read(SubChunkPosition::class, $in);
 
         $count = LE::readUnsignedInt($in);
         for($i = 0; $i < $count; ++$i){
@@ -32,7 +33,7 @@ class SubChunkRequestCodec implements Codec{
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof SubChunkRequestPacket);
         VarInt::writeSignedInt($out, $pk->dimension);
-        CodecHelper::writeSubChunk($out, $pk->basePosition);
+        $codec->write(SubChunkPosition::class, $out, $pk->basePosition);
 
         LE::writeUnsignedInt($out, count($pk->entries));
         foreach($pk->entries as $entry){

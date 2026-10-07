@@ -15,6 +15,7 @@ class BossEventPacket implements Packet{
     public int $bossActorUniqueId;
     public BossEventType $eventType;
 
+    /** @deprecated v2193 */
     public int $playerActorUniqueId;
     public float $healthPercent;
     public string $title;

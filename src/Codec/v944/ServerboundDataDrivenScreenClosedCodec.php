@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v944;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Enum\ScreenCloseReason;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\ServerboundDataDrivenScreenClosedPacket;
 use pmmp\encoding\ByteBufferReader;
@@ -18,13 +19,13 @@ class ServerboundDataDrivenScreenClosedCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : ServerboundDataDrivenScreenClosedPacket{
         $pk = new ServerboundDataDrivenScreenClosedPacket();
         $pk->formId = LE::readUnsignedInt($in);
-        $pk->closeReason = CodecHelper::readString($in);
+        $pk->closeReason = ScreenCloseReason::from(CodecHelper::readString($in));
         return $pk;
     }
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ServerboundDataDrivenScreenClosedPacket);
         LE::writeUnsignedInt($out, $pk->formId);
-        CodecHelper::writeString($out, $pk->closeReason);
+        CodecHelper::writeString($out, $pk->closeReason->value);
     }
 }
