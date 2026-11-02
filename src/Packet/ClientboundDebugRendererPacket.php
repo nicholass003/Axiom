@@ -23,5 +23,5 @@ class ClientboundDebugRendererPacket implements Packet{
     public float $alpha;
     public int $durationMillis;
 
-    public ?DebugMarkerData $data;
+    public ?DebugMarkerData $data = null;
 }

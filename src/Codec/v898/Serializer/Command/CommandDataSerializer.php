@@ -25,7 +25,7 @@ class CommandDataSerializer implements SerializerInterface{
 			flags: LE::readUnsignedShort($in),
 			permission: CommandPermissions::fromString(CodecHelper::readString($in)),
 			aliasEnumIndex: LE::readSignedInt($in),
-			chainedSubCommandDataIndexes: CodecHelper::readList($in, fn($in) => LE::readUnsignedShort($in)),
+			chainedSubCommandDataIndexes: CodecHelper::readList($in, fn($in) => LE::readUnsignedInt($in)),
 			overloads: CodecHelper::readList($in, fn($in) => $codec->read(CommandOverloadRawData::class, $in))
 		);
 	}
@@ -39,7 +39,7 @@ class CommandDataSerializer implements SerializerInterface{
 		CodecHelper::writeString($out, $data->permission->toString());
 		LE::writeSignedInt($out, $data->aliasEnumIndex);
 
-		CodecHelper::writeList($out, $data->chainedSubCommandDataIndexes, fn($out, $idx) => LE::writeUnsignedShort($out, $idx));
+		CodecHelper::writeList($out, $data->chainedSubCommandDataIndexes, fn($out, $idx) => LE::writeUnsignedInt($out, $idx));
 		CodecHelper::writeList($out, $data->overloads, fn($out, $v) => $codec->write(CommandOverloadRawData::class, $out, $v));
 	}
 }
