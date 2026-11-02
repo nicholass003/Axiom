@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nicholass003\Axiom\Codec\v844\Serializer\Recipe;
+namespace Nicholass003\Axiom\Codec\v2168\Serializer\Recipe;
 
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;

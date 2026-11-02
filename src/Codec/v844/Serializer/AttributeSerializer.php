@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Nicholass003\Axiom\Codec\v844\Serializer\Camera\Serializer;
+namespace Nicholass003\Axiom\Codec\v844\Serializer;
 
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;

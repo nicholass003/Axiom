@@ -23,7 +23,8 @@ class RecipeIngredientSerializer implements SerializerInterface{
 	use StatelessForkable;
 
 	public function read(ByteBufferReader $in, CodecType $codec) : RecipeIngredient{
-		$type = ItemDescriptorType::fromLegacy(Byte::readUnsigned($in));
+		$raw = Byte::readUnsigned($in);
+		$type = $raw === 0 ? null : ItemDescriptorType::fromLegacy($raw);
 		$descriptor = match($type){
 			ItemDescriptorType::INT_ID_META => $codec->read(IntIdMetaItemDescriptor::class, $in),
 			ItemDescriptorType::MOLANG => $codec->read(MolangItemDescriptor::class, $in),

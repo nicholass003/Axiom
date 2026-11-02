@@ -7,8 +7,6 @@ namespace Nicholass003\Axiom\Codec\v2168\Serializer\Recipe;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Codec\SerializerInterface;
 use Nicholass003\Axiom\Codec\Support\StatelessForkable;
-use Nicholass003\Axiom\Data\Type\Recipe\ComplexAliasItemDescriptor;
-use Nicholass003\Axiom\Data\Type\Recipe\IntIdMetaItemDescriptor;
 use Nicholass003\Axiom\Data\Type\Recipe\MolangItemDescriptor;
 use Nicholass003\Axiom\Data\Type\Recipe\RecipeIngredient;
 use Nicholass003\Axiom\Data\Type\Recipe\StringIdMetaItemDescriptor;
@@ -23,7 +21,8 @@ class RecipeIngredientSerializer implements SerializerInterface{
 	use StatelessForkable;
 
 	public function read(ByteBufferReader $in, CodecType $codec) : RecipeIngredient{
-		$type = ItemDescriptorType::tryFrom(Byte::readUnsigned($in));
+		$raw = Byte::readUnsigned($in);
+		$type = $raw === 0 ? null : ItemDescriptorType::fromLegacy($raw);
 		$descriptor = match($type){
 			ItemDescriptorType::MOLANG => $codec->read(MolangItemDescriptor::class, $in),
 			ItemDescriptorType::TAG => $codec->read(TagItemDescriptor::class, $in),
@@ -44,13 +43,11 @@ class RecipeIngredientSerializer implements SerializerInterface{
 			Byte::writeUnsigned($out, 0);
 		}else{
 			$type = $data->descriptor::ID;
-			Byte::writeUnsigned($out, $type->value);
+			Byte::writeUnsigned($out, $type->toLegacy());
 			match($type){
-				ItemDescriptorType::INT_ID_META => $codec->write(IntIdMetaItemDescriptor::class, $out, $data->descriptor),
 				ItemDescriptorType::MOLANG => $codec->write(MolangItemDescriptor::class, $out, $data->descriptor),
 				ItemDescriptorType::TAG => $codec->write(TagItemDescriptor::class, $out, $data->descriptor),
 				ItemDescriptorType::STRING_ID_META => $codec->write(StringIdMetaItemDescriptor::class, $out, $data->descriptor),
-				ItemDescriptorType::COMPLEX_ALIAS => $codec->write(ComplexAliasItemDescriptor::class, $out, $data->descriptor),
 				default => throw new \InvalidArgumentException("Unknown descriptor type")
 			};
 		}

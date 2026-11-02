@@ -155,6 +155,7 @@ use Nicholass003\Axiom\Codec\v844\ScriptMessageCodec;
 use Nicholass003\Axiom\Codec\v844\Serializer\AbilitiesLayerSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Armor\ArmorSlotAndDamagePairSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\AttributeModifierSerializer;
+use Nicholass003\Axiom\Codec\v844\Serializer\AttributeSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Biome\BiomeCappedSurfaceDataSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Biome\BiomeClimateDataSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Biome\BiomeConditionalTransformationDataSerializer;
@@ -197,7 +198,6 @@ use Nicholass003\Axiom\Codec\v844\Serializer\Camera\CameraSetInstructionSerializ
 use Nicholass003\Axiom\Codec\v844\Serializer\Camera\CameraSplineDefinitionSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Camera\CameraSplineInstructionSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Camera\CameraTargetInstructionSerializer;
-use Nicholass003\Axiom\Codec\v844\Serializer\Camera\Serializer\AttributeSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\ChunkCacheBlobSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Command\ChainedSubCommandDataSerializer;
 use Nicholass003\Axiom\Codec\v844\Serializer\Command\ChainedSubCommandValueSerializer;
