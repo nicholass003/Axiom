@@ -13,4 +13,5 @@ class StopSoundPacket implements Packet{
 
     public string $soundName; //TODO: should this use enum ??
     public bool $stopAll;
+    public bool $stopLegacyMusic;
 }

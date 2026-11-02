@@ -18,4 +18,5 @@ class SetTitlePacket implements Packet{
     public int $fadeOutTime;
     public string $xboxUserId = '';
     public string $platformOnlineId = '';
+    public string $filteredTitleText = '';
 }

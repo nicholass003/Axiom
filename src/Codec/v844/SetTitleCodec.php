@@ -24,6 +24,7 @@ class SetTitleCodec implements Codec{
         $pk->fadeOutTime = VarInt::readSignedInt($in);
         $pk->xboxUserId = CodecHelper::readString($in);
         $pk->platformOnlineId = CodecHelper::readString($in);
+        $pk->filteredTitleText = CodecHelper::readString($in);
         return $pk;
     }
 
@@ -36,5 +37,6 @@ class SetTitleCodec implements Codec{
         VarInt::writeSignedInt($out, $pk->fadeOutTime);
         CodecHelper::writeString($out, $pk->xboxUserId);
         CodecHelper::writeString($out, $pk->platformOnlineId);
+        CodecHelper::writeString($out, $pk->filteredTitleText);
     }
 }

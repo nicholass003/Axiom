@@ -18,6 +18,7 @@ class StopSoundCodec implements Codec{
         $pk = new StopSoundPacket();
         $pk->soundName = CodecHelper::readString($in);
         $pk->stopAll = CodecHelper::readBool($in);
+        $pk->stopLegacyMusic = CodecHelper::readBool($in);
         return $pk;
     }
 
@@ -25,5 +26,6 @@ class StopSoundCodec implements Codec{
         assert($pk instanceof StopSoundPacket);
         CodecHelper::writeString($out, $pk->soundName);
         CodecHelper::writeBool($out, $pk->stopAll);
+        CodecHelper::writeBool($out, $pk->stopLegacyMusic);
     }
 }
