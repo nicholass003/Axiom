@@ -42,7 +42,7 @@ class BiomeDefinitionChunkGenDataSerializer implements SerializerInterface{
 			overworldGenRules: CodecHelper::readOptional($in, fn($i) => $codec->read(BiomeOverworldGenRulesData::class, $i)),
 			multinoiseGenRules: CodecHelper::readOptional($in, fn($i) => $codec->read(BiomeMultinoiseGenRulesData::class, $i)),
 			legacyWorldGenRules: CodecHelper::readOptional($in, fn($i) => $codec->read(BiomeLegacyWorldGenRulesData::class, $i)),
-			replacementsData: CodecHelper::readOptional($in, fn($i) => CodecHelper::readList($i, fn($j) => $codec->read(BiomeReplacementData::class, $j))) ?? []
+			replacementsData: CodecHelper::readOptional($in, fn($i) => CodecHelper::readList($i, fn($j) => $codec->read(BiomeReplacementData::class, $j)))
 		);
 	}
 

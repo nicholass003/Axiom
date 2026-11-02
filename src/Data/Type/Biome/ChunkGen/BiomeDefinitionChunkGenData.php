@@ -10,7 +10,7 @@ class BiomeDefinitionChunkGenData{
 
     /** 
      * @since v859
-     * @var list<BiomeReplacementData> $replacementsData
+     * @var list<BiomeReplacementData>|null $replacementsData
      */
     public readonly ?array $replacementsData;
 
@@ -29,7 +29,7 @@ class BiomeDefinitionChunkGenData{
         public readonly ?BiomeOverworldGenRulesData $overworldGenRules,
         public readonly ?BiomeMultinoiseGenRulesData $multinoiseGenRules,
         public readonly ?BiomeLegacyWorldGenRulesData $legacyWorldGenRules,
-        array $replacementsData = [],
+        ?array $replacementsData = null,
     ){
         $this->replacementsData = $replacementsData;
     }
