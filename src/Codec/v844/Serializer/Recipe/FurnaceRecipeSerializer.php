@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Codec\SerializerInterface;
 use Nicholass003\Axiom\Codec\Support\StatelessForkable;
+use Nicholass003\Axiom\Data\Type\ItemStack;
 use Nicholass003\Axiom\Data\Type\Recipe\FurnaceRecipe;
 use Nicholass003\Axiom\Enum\RecipeType;
 use Nicholass003\Axiom\Packet\CraftingDataPacket;
@@ -18,13 +19,13 @@ use pmmp\encoding\VarInt;
 class FurnaceRecipeSerializer implements SerializerInterface{
 	use StatelessForkable;
 
-	public function read(ByteBufferReader $in, CodecType $codec,  RecipeType $typeId = RecipeType::UNKNOWN) : FurnaceRecipe{
+	public function read(ByteBufferReader $in, CodecType $codec,  RecipeType $typeId = RecipeType::FURNACE) : FurnaceRecipe{
 		$inputId = VarInt::readSignedInt($in);
 		$inputMeta = null;
 		if($typeId === CraftingDataPacket::ENTRY_FURNACE_DATA){
 			$inputMeta = VarInt::readSignedInt($in);
 		}
-		$result = CodecHelper::readItemStackWithoutStackId($in);
+		$result = $codec->read(ItemStack::class, $in);
 		$blockName = CodecHelper::readString($in);
 
 		return new FurnaceRecipe(
@@ -43,7 +44,7 @@ class FurnaceRecipeSerializer implements SerializerInterface{
 		if($data->typeId === CraftingDataPacket::ENTRY_FURNACE_DATA){
 			VarInt::writeSignedInt($out, $data->inputMeta);
 		}
-		CodecHelper::writeItemStackWithoutStackId($out, $data->result);
+		$codec->write(ItemStack::class, $out, $data->result);
 		CodecHelper::writeString($out, $data->blockName);
 	}
 }

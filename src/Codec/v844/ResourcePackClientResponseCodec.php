@@ -20,7 +20,7 @@ class ResourcePackClientResponseCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : ResourcePackClientResponsePacket{
         $pk = new ResourcePackClientResponsePacket();
-        $pk->status = ResourcePackClientResponseStatus::safe(Byte::readUnsigned($in));
+        $pk->status = ResourcePackClientResponseStatus::fromLegacyIndex(Byte::readUnsigned($in));
         $count = LE::readUnsignedShort($in);
         for($i = 0; $i < $count; $i++){
             $pk->packIds[] = CodecHelper::readString($in);
@@ -30,7 +30,7 @@ class ResourcePackClientResponseCodec implements Codec{
 
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof ResourcePackClientResponsePacket);
-        Byte::writeUnsigned($out, $pk->status->value);
+        Byte::writeUnsigned($out, $pk->status->toLegacyIndex());
         LE::writeUnsignedShort($out, count($pk->packIds));
         foreach($pk->packIds as $id){
             CodecHelper::writeString($out, $id);

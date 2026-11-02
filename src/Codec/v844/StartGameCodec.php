@@ -43,7 +43,7 @@ class StartGameCodec implements Codec{
         $pk->currentTick = LE::readUnsignedLong($in);
         $pk->enchantmentSeed = VarInt::readSignedInt($in);
 
-        $pk->blockPalette = $codec->read(BlockPaletteEntry::class, $in);
+        $pk->blockPalette = CodecHelper::readList($in, fn($i) => $codec->read(BlockPaletteEntry::class, $i));
 
         $pk->multiplayerCorrelationId = CodecHelper::readString($in);
         $pk->enableNewInventorySystem = CodecHelper::readBool($in);
@@ -88,7 +88,7 @@ class StartGameCodec implements Codec{
         LE::writeUnsignedLong($out, $pk->currentTick);
         VarInt::writeSignedInt($out, $pk->enchantmentSeed);
 
-        $codec->write(BlockPaletteEntry::class, $out, $pk->blockPalette);
+        CodecHelper::writeList($out, $pk->blockPalette, fn($o, $v) => $codec->write(BlockPaletteEntry::class, $o, $v));
 
         CodecHelper::writeString($out, $pk->multiplayerCorrelationId);
         CodecHelper::writeBool($out, $pk->enableNewInventorySystem);

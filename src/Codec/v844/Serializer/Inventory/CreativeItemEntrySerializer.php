@@ -9,6 +9,7 @@ use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Codec\SerializerInterface;
 use Nicholass003\Axiom\Codec\Support\StatelessForkable;
 use Nicholass003\Axiom\Data\Type\Inventory\CreativeItemEntry;
+use Nicholass003\Axiom\Data\Type\ItemStack;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -19,7 +20,7 @@ class CreativeItemEntrySerializer implements SerializerInterface{
 	public function read(ByteBufferReader $in, CodecType $codec) : CreativeItemEntry{
 		return new CreativeItemEntry(
 			entryId: CodecHelper::readCreativeItemNetId($in),
-			item: CodecHelper::readItemStackWithoutStackId($in),
+			item: $codec->read(ItemStack::class, $in),
 			groupId: VarInt::readUnsignedInt($in)
 		);
 	}
@@ -28,7 +29,7 @@ class CreativeItemEntrySerializer implements SerializerInterface{
 		assert($data instanceof CreativeItemEntry);
 
 		CodecHelper::writeCreativeItemNetId($out, $data->entryId);
-		CodecHelper::writeItemStackWithoutStackId($out, $data->item);
+		$codec->write(ItemStack::class, $out, $data->item);
 		VarInt::writeUnsignedInt($out, $data->groupId);
 	}
 }

@@ -21,7 +21,6 @@ class SetScoreCodec implements Codec{
         $pk = new SetScorePacket();
         $pk->type = SetScorePacketType::safe(Byte::readUnsigned($in));
         $isRemove = $pk->type === SetScorePacketType::REMOVE;
-        $isRemove = $pk->type === SetScorePacketType::REMOVE;
         $pk->entries = CodecHelper::readList($in, fn($i) => $codec->get(ScorePacketEntry::class)->read($i, $codec, $isRemove));
         return $pk;
     }
@@ -29,7 +28,6 @@ class SetScoreCodec implements Codec{
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof SetScorePacket);
         Byte::writeUnsigned($out, $pk->type->value);
-        $isRemove = $pk->type === SetScorePacketType::REMOVE;
         $isRemove = $pk->type === SetScorePacketType::REMOVE;
         CodecHelper::writeList($out, $pk->entries, fn($o, $v) => $codec->get(ScorePacketEntry::class)->write($o, $v, $codec, $isRemove));
     }

@@ -9,6 +9,7 @@ use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Codec\v2168\AddActorCodec;
 use Nicholass003\Axiom\Codec\v2168\AnvilDamageCodec;
 use Nicholass003\Axiom\Codec\v2168\ClientboundUpdateSoundDataCodec;
+use Nicholass003\Axiom\Codec\v2168\CraftingDataCodec;
 use Nicholass003\Axiom\Codec\v2168\GameRulesChangedCodec;
 use Nicholass003\Axiom\Codec\v2168\InventoryContentCodec;
 use Nicholass003\Axiom\Codec\v2168\InventorySlotCodec;
@@ -22,9 +23,12 @@ use Nicholass003\Axiom\Codec\v2168\PlayerAuthInputCodec;
 use Nicholass003\Axiom\Codec\v2168\PlayerListCodec;
 use Nicholass003\Axiom\Codec\v2168\PlayerLocationCodec;
 use Nicholass003\Axiom\Codec\v2168\PlaySoundCodec;
+use Nicholass003\Axiom\Codec\v2168\ResourcePackClientResponseCodec;
+use Nicholass003\Axiom\Codec\v2168\ResourcePacksInfoCodec;
 use Nicholass003\Axiom\Codec\v2168\Serializer\AttributeSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\EntityDiagnosticTimingInfoSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\GatheringJoinInfoSerializer;
+use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\CreativeGroupEntrySerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\InventoryTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\MismatchTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\NormalTransactionDataSerializer;
@@ -32,8 +36,10 @@ use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\ReleaseItemTransactionDa
 use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\StackResponse\ItemStackResponseSlotInfoSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\UseItemOnEntityTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\Inventory\UseItemTransactionDataSerializer;
+use Nicholass003\Axiom\Codec\v2168\Serializer\ItemStackSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\ItemStackWrapperSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\MemoryCategoryCounterSerializer;
+use Nicholass003\Axiom\Codec\v2168\Serializer\MetadataEntrySerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\MovePlayerTeleportDataSerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\PlayerListEntrySerializer;
 use Nicholass003\Axiom\Codec\v2168\Serializer\Score\ScoreboardIdentityPacketEntrySerializer;
@@ -48,9 +54,11 @@ use Nicholass003\Axiom\Codec\v2168\ServerboundDiagnosticsCodec;
 use Nicholass003\Axiom\Codec\v2168\SetScoreboardIdentityCodec;
 use Nicholass003\Axiom\Codec\v2168\SetScoreCodec;
 use Nicholass003\Axiom\Codec\v2168\StartGameCodec;
-use Nicholass003\Axiom\Codec\v2168\TransferCodec;use Nicholass003\Axiom\Data\Type\Attribute;
+use Nicholass003\Axiom\Codec\v2168\TransferCodec;
+use Nicholass003\Axiom\Data\Type\Attribute;
 use Nicholass003\Axiom\Data\Type\EntityDiagnosticTimingInfo;
 use Nicholass003\Axiom\Data\Type\GatheringJoinInfo;
+use Nicholass003\Axiom\Data\Type\Inventory\CreativeGroupEntry;
 use Nicholass003\Axiom\Data\Type\Inventory\MismatchTransactionData;
 use Nicholass003\Axiom\Data\Type\Inventory\NormalTransactionData;
 use Nicholass003\Axiom\Data\Type\Inventory\ReleaseItemTransactionData;
@@ -58,8 +66,10 @@ use Nicholass003\Axiom\Data\Type\Inventory\StackResponse\ItemStackResponseSlotIn
 use Nicholass003\Axiom\Data\Type\Inventory\TransactionData;
 use Nicholass003\Axiom\Data\Type\Inventory\UseItemOnEntityTransactionData;
 use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
+use Nicholass003\Axiom\Data\Type\ItemStack;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\MemoryCategoryCounter;
+use Nicholass003\Axiom\Data\Type\MetadataEntry;
 use Nicholass003\Axiom\Data\Type\MovePlayerTeleportData;
 use Nicholass003\Axiom\Data\Type\PlayerListEntry;
 use Nicholass003\Axiom\Data\Type\Score\ScoreboardIdentityPacketEntry;
@@ -86,6 +96,8 @@ use Nicholass003\Axiom\Packet\PlayerAuthInputPacket;
 use Nicholass003\Axiom\Packet\PlayerListPacket;
 use Nicholass003\Axiom\Packet\PlayerLocationPacket;
 use Nicholass003\Axiom\Packet\PlaySoundPacket;
+use Nicholass003\Axiom\Packet\ResourcePackClientResponsePacket;
+use Nicholass003\Axiom\Packet\ResourcePacksInfoPacket;
 use Nicholass003\Axiom\Packet\ServerboundDiagnosticsPacket;
 use Nicholass003\Axiom\Packet\SetScoreboardIdentityPacket;
 use Nicholass003\Axiom\Packet\SetScorePacket;
@@ -93,16 +105,20 @@ use Nicholass003\Axiom\Packet\StartGamePacket;
 use Nicholass003\Axiom\Packet\TransferPacket;
 use Nicholass003\Axiom\Version\MinecraftVersionNetwork;
 use Nicholass003\Axiom\Version\ProtocolVersion;
+use Nicholass003\Axiom\Packet\CraftingDataPacket;
 
 class Protocol2168 implements ProtocolInterface{
 
     public static function buildCodecType() : CodecType{
         $codec = Protocol1001::buildCodecType()->fork();
-        $codec->register(Attribute::class, new AttributeSerializer());
+        $codec->override(Attribute::class, new AttributeSerializer());
+        $codec->override(CreativeGroupEntry::class, new CreativeGroupEntrySerializer());
         $codec->override(EntityDiagnosticTimingInfo::class, new EntityDiagnosticTimingInfoSerializer());
         $codec->override(GatheringJoinInfo::class, new GatheringJoinInfoSerializer());
+        $codec->override(ItemStack::class, new ItemStackSerializer());
         $codec->override(ItemStackWrapper::class, new ItemStackWrapperSerializer());
         $codec->override(MemoryCategoryCounter::class, new MemoryCategoryCounterSerializer());
+        $codec->override(MetadataEntry::class, new MetadataEntrySerializer());
         $codec->override(MovePlayerTeleportData::class, new MovePlayerTeleportDataSerializer());
         $codec->override(PlayerListEntry::class, new PlayerListEntrySerializer());
         $codec->override(SkinData::class, new SkinDataSerializer());
@@ -148,6 +164,9 @@ class Protocol2168 implements ProtocolInterface{
             ->override(PlayerLocationPacket::ID, new PlayerLocationCodec())
             ->override(PlaySoundPacket::ID, new PlaySoundCodec())
             ->override(TransferPacket::ID, new TransferCodec())
+            ->override(ResourcePackClientResponsePacket::ID, new ResourcePackClientResponseCodec())
+            ->override(ResourcePacksInfoPacket::ID, new ResourcePacksInfoCodec())
+            ->override(CraftingDataPacket::ID, new CraftingDataCodec())
             ->override(ServerboundDiagnosticsPacket::ID, new ServerboundDiagnosticsCodec())
             ->override(SetScoreboardIdentityPacket::ID, new SetScoreboardIdentityCodec())
             ->override(SetScorePacket::ID, new SetScoreCodec());

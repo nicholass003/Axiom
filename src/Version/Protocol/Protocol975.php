@@ -18,6 +18,7 @@ use Nicholass003\Axiom\Codec\v975\Serializer\ClientStoreEntrypointConfigSerializ
 use Nicholass003\Axiom\Codec\v975\Serializer\EntityDiagnosticTimingInfoSerializer;
 use Nicholass003\Axiom\Codec\v975\Serializer\ItemStackWrapperSerializer;
 use Nicholass003\Axiom\Codec\v975\Serializer\PresenceConfigSerializer;
+use Nicholass003\Axiom\Codec\v975\Serializer\Recipe\RecipeWithTypeIdSerializer;
 use Nicholass003\Axiom\Codec\v975\Serializer\SystemDiagnosticTimingInfoSerializer;
 use Nicholass003\Axiom\Codec\v975\ServerboundDiagnosticsCodec;
 use Nicholass003\Axiom\Codec\v975\ServerPresenceInfoCodec;
@@ -27,6 +28,7 @@ use Nicholass003\Axiom\Data\Type\ClientStoreEntrypointConfig;
 use Nicholass003\Axiom\Data\Type\EntityDiagnosticTimingInfo;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\PresenceConfig;
+use Nicholass003\Axiom\Data\Type\Recipe\RecipeWithTypeId;
 use Nicholass003\Axiom\Data\Type\SystemDiagnosticTimingInfo;
 use Nicholass003\Axiom\Packet\ActorEventPacket;
 use Nicholass003\Axiom\Packet\ClientMovementPredictionSyncPacket;
@@ -52,6 +54,7 @@ class Protocol975 implements ProtocolInterface{
         $codec->register(EntityDiagnosticTimingInfo::class, new EntityDiagnosticTimingInfoSerializer());
         $codec->register(SystemDiagnosticTimingInfo::class, new SystemDiagnosticTimingInfoSerializer());
         $codec->override(ItemStackWrapper::class, new ItemStackWrapperSerializer());
+        $codec->override(RecipeWithTypeId::class, new RecipeWithTypeIdSerializer());
         return $codec;
     }
 

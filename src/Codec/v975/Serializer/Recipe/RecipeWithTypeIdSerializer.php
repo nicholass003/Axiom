@@ -22,7 +22,8 @@ class RecipeWithTypeIdSerializer implements SerializerInterface{
 	use StatelessForkable;
 
 	public function read(ByteBufferReader $in, CodecType $codec) : RecipeWithTypeId{
-		$typeId = RecipeType::safe(VarInt::readSignedInt($in));
+		$raw = VarInt::readSignedInt($in);
+		$typeId = RecipeType::safe($raw);
 
 		return match($typeId){
 			RecipeType::SHAPELESS,
@@ -33,7 +34,7 @@ class RecipeWithTypeIdSerializer implements SerializerInterface{
 			RecipeType::MULTI => $codec->get(MultiRecipe::class)->read($in, $codec, $typeId),
 			RecipeType::SMITHING_TRANSFORM => $codec->get(SmithingTransformRecipe::class)->read($in, $codec, $typeId),
 			RecipeType::SMITHING_TRIM => $codec->get(SmithingTrimRecipe::class)->read($in, $codec, $typeId),
-			default => throw new \RuntimeException("Unknown recipe type $typeId")
+			default => throw new \RuntimeException("Unknown recipe type $typeId->value, raw value $raw")
 		};
 	}
 

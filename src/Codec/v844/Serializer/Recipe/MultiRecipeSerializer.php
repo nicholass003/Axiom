@@ -16,7 +16,7 @@ use pmmp\encoding\ByteBufferWriter;
 class MultiRecipeSerializer implements SerializerInterface{
 	use StatelessForkable;
 
-	public function read(ByteBufferReader $in, CodecType $codec,  RecipeType $typeId = RecipeType::UNKNOWN) : MultiRecipe{
+	public function read(ByteBufferReader $in, CodecType $codec,  RecipeType $typeId = RecipeType::MULTI) : MultiRecipe{
 		$uuid = CodecHelper::readUuid($in);
 		$recipeNetId = CodecHelper::readRecipeNetId($in);
 

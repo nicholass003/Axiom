@@ -31,14 +31,7 @@ class AddActorCodec implements Codec{
         $pk->headYaw = LE::readFloat($in);
         $pk->bodyYaw = LE::readFloat($in);
 
-        $attrCount = VarInt::readUnsignedInt($in);
-        for($i = 0; $i < $attrCount; ++$i){
-            $id = CodecHelper::readString($in);
-            $min = LE::readFloat($in);
-            $current = LE::readFloat($in);
-            $max = LE::readFloat($in);
-            $pk->attributes[] = new Attribute($id, $min, $max, $current, $current, []);
-        }
+        $pk->attributes = CodecHelper::readList($in, fn($i) => $codec->read(Attribute::class, $i));
 
         $pk->metadata = CodecHelper::readList($in, fn($i) => $codec->read(MetadataEntry::class, $i));
         $pk->syncedProperties = $codec->read(PropertySyncData::class, $in);
@@ -63,13 +56,7 @@ class AddActorCodec implements Codec{
         LE::writeFloat($out, $pk->headYaw);
         LE::writeFloat($out, $pk->bodyYaw);
 
-        VarInt::writeUnsignedInt($out, count($pk->attributes));
-        foreach($pk->attributes as $attribute){
-            CodecHelper::writeString($out, $attribute->id);
-            LE::writeFloat($out, $attribute->min);
-            LE::writeFloat($out, $attribute->current);
-            LE::writeFloat($out, $attribute->max);
-        }
+        CodecHelper::writeList($out, $pk->attributes, fn($o, $v) => $codec->write(Attribute::class, $o, $v));
 
         CodecHelper::writeList($out, $pk->metadata, fn($o, $v) => $codec->write(MetadataEntry::class, $o, $v));
         $codec->write(PropertySyncData::class, $out, $pk->syncedProperties);

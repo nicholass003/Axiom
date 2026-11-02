@@ -13,7 +13,7 @@ class PlayerListPacket implements Packet{
     public const ID = PacketIds::PLAYER_LIST;
     public const RECIPIENT = PacketRecipient::CLIENT;
 
-    public PlayerListType $type;
+    public PlayerListType $type = PlayerListType::ADD;
 
     /** @var PlayerListEntry[] */
     public array $entries = [];

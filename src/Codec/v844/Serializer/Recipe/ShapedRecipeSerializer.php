@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Codec\SerializerInterface;
 use Nicholass003\Axiom\Codec\Support\StatelessForkable;
+use Nicholass003\Axiom\Data\Type\ItemStack;
 use Nicholass003\Axiom\Data\Type\Recipe\RecipeIngredient;
 use Nicholass003\Axiom\Data\Type\Recipe\RecipeUnlockingRequirement;
 use Nicholass003\Axiom\Data\Type\Recipe\ShapedRecipe;
@@ -19,7 +20,7 @@ use pmmp\encoding\VarInt;
 class ShapedRecipeSerializer implements SerializerInterface{
 	use StatelessForkable;
 
-	public function read(ByteBufferReader $in, CodecType $codec, RecipeType $typeId = RecipeType::UNKNOWN) : ShapedRecipe{
+	public function read(ByteBufferReader $in, CodecType $codec, RecipeType $typeId = RecipeType::SHAPED) : ShapedRecipe{
 		$recipeId = CodecHelper::readString($in);
 		$width = VarInt::readSignedInt($in);
 		$height = VarInt::readSignedInt($in);
@@ -36,7 +37,7 @@ class ShapedRecipeSerializer implements SerializerInterface{
 		$outputCount = VarInt::readUnsignedInt($in);
 		$output = [];
 		for($i = 0; $i < $outputCount; $i++){
-			$output[] = CodecHelper::readItemStackWithoutStackId($in);
+			$output[] = $codec->read(ItemStack::class, $in);
 		}
 
 		$uuid = CodecHelper::readUuid($in);
@@ -73,7 +74,7 @@ class ShapedRecipeSerializer implements SerializerInterface{
 		}
 		VarInt::writeUnsignedInt($out, count($data->output));
 		foreach($data->output as $item){
-			CodecHelper::writeItemStackWithoutStackId($out, $item);
+			$codec->write(ItemStack::class, $out, $item);
 		}
 		CodecHelper::writeUuid($out, $data->uuid);
 		CodecHelper::writeString($out, $data->blockName);

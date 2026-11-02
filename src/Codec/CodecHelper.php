@@ -10,7 +10,6 @@ use Nicholass003\Axiom\Codec\Common\Serializer\NetworkNbtSerializer;
 use Nicholass003\Axiom\Data\Type\BlockPosition;
 use Nicholass003\Axiom\Data\Type\ChunkPosition;
 use Nicholass003\Axiom\Data\Type\EntityLink;
-use Nicholass003\Axiom\Data\Type\ItemStack;
 use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPosition;
 use Nicholass003\Axiom\Data\Type\SubChunk\SubChunkPositionOffset;
 use Nicholass003\Axiom\Data\Type\Vec2;
@@ -368,30 +367,6 @@ class CodecHelper{
                 break;
             }
         }
-    }
-
-    public static function readItemStackWithoutStackId(ByteBufferReader $in) : ItemStack{
-        $id = VarInt::readSignedInt($in);
-        if($id === 0){
-            return new ItemStack(0, 0, 0, 0, '');
-        }
-        $count = LE::readUnsignedShort($in);
-        $meta = VarInt::readUnsignedInt($in);
-        $blockRuntimeId = VarInt::readSignedInt($in);
-        $rawExtraData = self::readString($in);
-        return new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData);
-    }
-
-    public static function writeItemStackWithoutStackId(ByteBufferWriter $out, ItemStack $item) : void{
-        if($item->id === 0){
-            VarInt::writeSignedInt($out, 0);
-            return;
-        }
-        VarInt::writeSignedInt($out, $item->id);
-        LE::writeUnsignedShort($out, $item->count);
-        VarInt::writeUnsignedInt($out, $item->meta);
-        VarInt::writeSignedInt($out, $item->blockRuntimeId);
-        self::writeString($out, $item->rawExtraData);
     }
 
     public static function readRecipeNetId(ByteBufferReader $in) : int{

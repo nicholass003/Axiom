@@ -17,7 +17,7 @@ use pmmp\encoding\ByteBufferWriter;
 class SmithingTrimRecipeSerializer implements SerializerInterface{
 	use StatelessForkable;
 
-	public function read(ByteBufferReader $in, CodecType $codec,  RecipeType $typeId = RecipeType::UNKNOWN) : SmithingTrimRecipe{
+	public function read(ByteBufferReader $in, CodecType $codec,  RecipeType $typeId = RecipeType::SMITHING_TRIM) : SmithingTrimRecipe{
 		$recipeId = CodecHelper::readString($in);
 		$template = $codec->read(RecipeIngredient::class, $in);
 		$input = $codec->read(RecipeIngredient::class, $in);

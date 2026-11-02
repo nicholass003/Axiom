@@ -57,8 +57,8 @@ class CodecBuilder{
         return $new;
     }
 
-    public function get(int $packetId) : Codec{
-        return $this->codecs[$packetId] ?? throw new \InvalidArgumentException("No codec for packet 0x" . dechex($packetId));
+    public function get(int $packetId) : ?Codec{
+        return $this->codecs[$packetId] ?? null;
     }
 
     /**
