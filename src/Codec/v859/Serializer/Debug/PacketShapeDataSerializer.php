@@ -98,7 +98,7 @@ class PacketShapeDataSerializer implements SerializerInterface{
 		CodecHelper::writeOptional($out, $data->rotation, fn($o, $v) => CodecHelper::writeVec3($o, $v));
 		CodecHelper::writeOptional($out, $data->totalTimeLeft, fn($o, $v) => LE::writeFloat($o, $v));
 		CodecHelper::writeOptional($out, $data->colorArgb, fn($o, $v) => LE::writeUnsignedInt($o, $v));
-		VarInt::writeSignedInt($out, $data->dimensionId);
+		VarInt::writeSignedInt($out, $data->dimensionId ?? 0);
 
 		$payloadType = $data->type?->getPayloadType() ?? ScriptDebugShapeType::PAYLOAD_TYPE_NONE;
 		if($data->type === null){

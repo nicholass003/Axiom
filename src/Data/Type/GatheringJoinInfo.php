@@ -12,6 +12,8 @@ class GatheringJoinInfo{
 	public readonly string $scenarioId;
     /** @since v975 */
 	public readonly string $serverId;
+    /** @since v924 */
+	public readonly string $storeId;
 
     public function __construct(
 		public readonly string $experienceId,
@@ -21,10 +23,12 @@ class GatheringJoinInfo{
 		public readonly string $creatorId,
 		string $targetId = '',
 		string $scenarioId = '',
-		string $serverId = ''
+		string $serverId = '',
+		string $storeId = ''
     ){
 		$this->targetId = $targetId;
 		$this->scenarioId = $scenarioId;
 		$this->serverId = $serverId;
+		$this->storeId = $storeId;
 	}
 }

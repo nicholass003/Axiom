@@ -21,7 +21,8 @@ class GatheringJoinInfoSerializer implements SerializerInterface{
 			experienceName: CodecHelper::readString($in),
 			experienceWorldId: CodecHelper::readString($in),
 			experienceWorldName: CodecHelper::readString($in),
-			creatorId: CodecHelper::readString($in)
+			creatorId: CodecHelper::readString($in),
+			storeId: CodecHelper::readString($in)
 		);
 	}
 
@@ -33,5 +34,6 @@ class GatheringJoinInfoSerializer implements SerializerInterface{
 		CodecHelper::writeString($out, $data->experienceWorldId);
 		CodecHelper::writeString($out, $data->experienceWorldName);
 		CodecHelper::writeString($out, $data->creatorId);
+		CodecHelper::writeString($out, $data->storeId);
 	}
 }

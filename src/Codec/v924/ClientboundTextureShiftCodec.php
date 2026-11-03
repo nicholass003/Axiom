@@ -37,5 +37,8 @@ class ClientboundTextureShiftCodec implements Codec{
         CodecHelper::writeString($out, $pk->fromStep);
         CodecHelper::writeString($out, $pk->toStep);
         CodecHelper::writeList($out, $pk->allSteps, CodecHelper::writeString(...));
+        VarInt::writeUnsignedLong($out, $pk->currentLengthTicks);
+        VarInt::writeUnsignedLong($out, $pk->totalLengthTicks);
+        CodecHelper::writeBool($out, $pk->enabled);
     }
 }

@@ -15,7 +15,6 @@ use Nicholass003\Axiom\Data\Type\DataStore\StringDataStoreValue;
 use Nicholass003\Axiom\Enum\DataStoreValueType;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
 class DataStoreChangeSerializer implements SerializerInterface{
@@ -24,7 +23,7 @@ class DataStoreChangeSerializer implements SerializerInterface{
 	public function read(ByteBufferReader $in, CodecType $codec) : DataStoreChange{
 		$name = CodecHelper::readString($in);
 		$property = CodecHelper::readString($in);
-		$updateCount = LE::readUnsignedInt($in);
+		$updateCount = VarInt::readUnsignedInt($in);
 
 		$valueType = DataStoreValueType::safe(VarInt::readUnsignedInt($in));
 		$data = match($valueType){
@@ -42,7 +41,7 @@ class DataStoreChangeSerializer implements SerializerInterface{
 
 		CodecHelper::writeString($out, $data->name);
 		CodecHelper::writeString($out, $data->property);
-		LE::writeUnsignedInt($out, $data->updateCount);
+		VarInt::writeUnsignedInt($out, $data->updateCount);
 
 		VarInt::writeUnsignedInt($out, $data->data->type->value);
 		$codec->write($data->data::class, $out, $data->data);

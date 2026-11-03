@@ -33,6 +33,7 @@ class VoxelShapesCodec implements Codec{
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof VoxelShapesPacket);
         CodecHelper::writeList($out, $pk->shapes, fn($o, $v) => $codec->write(SerializableVoxelShape::class, $o, $v));
+        VarInt::writeUnsignedInt($out, count($pk->nameMap));
         foreach($pk->nameMap as $name => $id){
             CodecHelper::writeString($out, $name);
             LE::writeUnsignedShort($out, $id);

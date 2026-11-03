@@ -13,6 +13,11 @@ class BiomeDefinitionChunkGenData{
      * @var list<BiomeReplacementData>|null $replacementsData
      */
     public readonly ?array $replacementsData;
+    /** 
+     * @since v924
+     * @var int|null $villageType
+     */
+    public readonly ?int $villageType;
 
     public function __construct(
         public readonly ?BiomeClimateData $climate,
@@ -30,7 +35,9 @@ class BiomeDefinitionChunkGenData{
         public readonly ?BiomeMultinoiseGenRulesData $multinoiseGenRules,
         public readonly ?BiomeLegacyWorldGenRulesData $legacyWorldGenRules,
         ?array $replacementsData = null,
+        ?int $villageType = null,
     ){
         $this->replacementsData = $replacementsData;
+        $this->villageType = $villageType;
     }
 }

@@ -7,9 +7,9 @@ namespace Nicholass003\Axiom\Enum;
 enum InventoryLayout : int{
 
     case NONE = 0;
-    case SURVIVAL = 1;
-    case RECIPE_BOOK = 2;
-    case CREATIVE = 3;
+    case INVENTORY_ONLY = 1;
+    case DEFAULT = 2;
+    case RECIPE_BOOK_ONLY = 3;
 
     public static function safe(int $value) : self{
         return self::tryFrom($value) ?? self::NONE;

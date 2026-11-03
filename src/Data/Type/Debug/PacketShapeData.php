@@ -23,6 +23,9 @@ class PacketShapeData{
         public readonly ?float $arrowHeadLength,
         public readonly ?float $arrowHeadRadius,
         public readonly ?int $segments,
-        public readonly int $dimensionId = 0,
+        /** Optional since v924; required in earlier protocols. */
+        public readonly ?int $dimensionId = null,
+        /** @since v924 */
+        public readonly ?int $attachedToEntityId = null,
     ){}
 }
