@@ -7,6 +7,7 @@ namespace Nicholass003\Axiom\Codec\v2193;
 use Nicholass003\Axiom\Codec\Codec;
 use Nicholass003\Axiom\Codec\CodecHelper;
 use Nicholass003\Axiom\Codec\CodecType;
+use Nicholass003\Axiom\Data\Type\BlockPosition;
 use Nicholass003\Axiom\Data\Type\Vec3;
 use Nicholass003\Axiom\Packet\Packet;
 use Nicholass003\Axiom\Packet\PlaySoundPacket;
@@ -20,10 +21,11 @@ class PlaySoundCodec implements Codec{
     public function decode(ByteBufferReader $in, CodecType $codec) : PlaySoundPacket{
         $pk = new PlaySoundPacket();
         $pk->soundName = CodecHelper::readString($in);
+        $blockPosition = CodecHelper::readSignedBlockPosition($in);
         $pk->position = new Vec3(
-            LE::readSignedInt($in) / 8,
-            LE::readSignedInt($in) / 8,
-            LE::readSignedInt($in) / 8
+            $blockPosition->x / 8,
+            $blockPosition->y / 8,
+            $blockPosition->z / 8
         );
         $pk->volume = LE::readFloat($in);
         $pk->pitch = LE::readFloat($in);
@@ -37,9 +39,11 @@ class PlaySoundCodec implements Codec{
     public function encode(ByteBufferWriter $out, Packet $pk, CodecType $codec) : void{
         assert($pk instanceof PlaySoundPacket);
         CodecHelper::writeString($out, $pk->soundName);
-        LE::writeSignedInt($out, (int) ($pk->position->x * 8));
-        LE::writeSignedInt($out, (int) ($pk->position->y * 8));
-        LE::writeSignedInt($out, (int) ($pk->position->z * 8));
+        CodecHelper::writeSignedBlockPosition($out, new BlockPosition(
+            (int) ($pk->position->x * 8),
+            (int) ($pk->position->y * 8),
+            (int) ($pk->position->z * 8)
+        ));
         LE::writeFloat($out, $pk->volume);
         LE::writeFloat($out, $pk->pitch);
         VarInt::writeSignedInt($out, $pk->loopCount);

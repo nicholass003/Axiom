@@ -75,6 +75,10 @@ class CodecHelper{
         VarInt::writeUnsignedLong($out, $id);
     }
 
+    /**
+     * @deprecated Legacy block position format (Y written as an unsigned varint). Only valid for
+     *             protocols before v944. Protocol v944+ uses {@see readSignedBlockPosition()} (zigzag X/Y/Z).
+     */
     public static function readBlockPosition(ByteBufferReader $in) : BlockPosition{
         $x = VarInt::readSignedInt($in);
         $y = Binary::signInt(VarInt::readUnsignedInt($in));
@@ -82,6 +86,10 @@ class CodecHelper{
         return new BlockPosition($x, $y, $z);
     }
 
+    /**
+     * @deprecated Legacy block position format (Y written as an unsigned varint). Only valid for
+     *             protocols before v944. Protocol v944+ uses {@see writeSignedBlockPosition()} (zigzag X/Y/Z).
+     */
     public static function writeBlockPosition(ByteBufferWriter $out, BlockPosition $pos) : void{
         VarInt::writeSignedInt($out, $pos->x);
         VarInt::writeUnsignedInt($out, Binary::unsignInt($pos->y));

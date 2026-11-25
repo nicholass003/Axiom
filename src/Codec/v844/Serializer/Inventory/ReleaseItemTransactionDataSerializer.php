@@ -33,6 +33,7 @@ class ReleaseItemTransactionDataSerializer implements SerializerInterface{
 	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
 		assert($data instanceof ReleaseItemTransactionData);
 
+		CodecHelper::writeList($out, $data->actions, fn($out, $a) => $codec->write(NetworkInventoryAction::class, $out, $a));
 		VarInt::writeUnsignedInt($out, $data->actionType);
 		VarInt::writeSignedInt($out, $data->hotbarSlot);
 		$codec->write(ItemStackWrapper::class, $out, $data->itemInHand);

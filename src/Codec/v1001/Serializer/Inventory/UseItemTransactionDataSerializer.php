@@ -11,6 +11,7 @@ use Nicholass003\Axiom\Codec\Support\StatelessForkable;
 use Nicholass003\Axiom\Data\Type\Inventory\NetworkInventoryAction;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
+use Nicholass003\Axiom\Enum\HandSlot;
 use Nicholass003\Axiom\Enum\PredictedResult;
 use Nicholass003\Axiom\Enum\TriggerType;
 use pmmp\encoding\Byte;
@@ -42,25 +43,29 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 		if($predictedResult === PredictedResult::UNKNOWN){
 			throw new \RuntimeException("Invalid predicted result $predictedRaw");
 		}
+		$clientCooldownState = Byte::readUnsigned($in);
 
 		return new UseItemTransactionData(
-			$actions,
-			$actionType,
-			$triggerType,
-			$blockPosition,
-			$face,
-			$hotbarSlot,
-			$itemInHand,
-			$playerPosition,
-			$clickPosition,
-			$blockRuntimeId,
-			$predictedResult
+			actions: $actions,
+			actionType: $actionType,
+			triggerType: $triggerType,
+			blockPosition: $blockPosition,
+			face: $face,
+			hotbarSlot: $hotbarSlot,
+			hand: HandSlot::MAINHAND,
+			itemInHand: $itemInHand,
+			playerPosition: $playerPosition,
+			clickPosition: $clickPosition,
+			blockRuntimeId: $blockRuntimeId,
+			clientInteractPrediction: $predictedResult,
+			clientCooldownState: $clientCooldownState
 		);
 	}
 
 	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
 		assert($data instanceof UseItemTransactionData);
 
+		CodecHelper::writeList($out, $data->actions, fn($out, $a) => $codec->write(NetworkInventoryAction::class, $out, $a));
 		VarInt::writeSignedInt($out, $data->actionType);
 		Byte::writeUnsigned($out, $data->triggerType->value);
 		CodecHelper::writeSignedBlockPosition($out, $data->blockPosition);
@@ -71,5 +76,6 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 		CodecHelper::writeVec3($out, $data->clickPosition);
 		VarInt::writeUnsignedInt($out, $data->blockRuntimeId);
 		Byte::writeUnsigned($out, $data->clientInteractPrediction->value);
+		Byte::writeUnsigned($out, $data->clientCooldownState);
 	}
 }

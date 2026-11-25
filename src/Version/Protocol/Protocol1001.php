@@ -15,6 +15,7 @@ use Nicholass003\Axiom\Codec\v1001\LevelSoundEventCodec;
 use Nicholass003\Axiom\Codec\v1001\MobArmorEquipmentCodec;
 use Nicholass003\Axiom\Codec\v1001\PartyDestinationCookieResponseCodec;
 use Nicholass003\Axiom\Codec\v1001\SendPartyDestinationCookieCodec;
+use Nicholass003\Axiom\Codec\v1001\Serializer\Attribute\AttributeEnvironmentSerializer;
 use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\InventoryTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\NetworkInventoryActionSerializer;
 use Nicholass003\Axiom\Codec\v1001\Serializer\Inventory\ReleaseItemTransactionDataSerializer;
@@ -27,6 +28,7 @@ use Nicholass003\Axiom\Codec\v1001\ServerboundDiagnosticsCodec;
 use Nicholass003\Axiom\Codec\v1001\ServerPresenceInfoCodec;
 use Nicholass003\Axiom\Codec\v1001\StartGameCodec;
 use Nicholass003\Axiom\Codec\v1001\SubChunkRequestCodec;
+use Nicholass003\Axiom\Data\Type\AttributeEnvironment;
 use Nicholass003\Axiom\Data\Type\Inventory\NetworkInventoryAction;
 use Nicholass003\Axiom\Data\Type\Inventory\ReleaseItemTransactionData;
 use Nicholass003\Axiom\Data\Type\Inventory\TransactionData;
@@ -55,6 +57,7 @@ class Protocol1001 implements ProtocolInterface{
 
     public static function buildCodecType() : CodecType{
         $codec = Protocol975::buildCodecType()->fork();
+        $codec->override(AttributeEnvironment::class, new AttributeEnvironmentSerializer());
         $codec->override(PresenceConfig::class, new PresenceConfigSerializer());
         $codec->override(LevelSettingsData::class, new LevelSettingsDataSerializer());
         $codec->override(TransactionData::class, new InventoryTransactionDataSerializer());

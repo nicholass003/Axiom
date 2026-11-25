@@ -35,6 +35,7 @@ class UseItemOnEntityTransactionDataSerializer implements SerializerInterface{
 	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
 		assert($data instanceof UseItemOnEntityTransactionData);
 
+		CodecHelper::writeList($out, $data->actions, fn($out, $a) => $codec->write(NetworkInventoryAction::class, $out, $a));
 		CodecHelper::writeActorRuntimeId($out, $data->actorRuntimeId);
 		VarInt::writeUnsignedInt($out, $data->actionType);
 		VarInt::writeSignedInt($out, $data->hotbarSlot);

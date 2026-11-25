@@ -20,7 +20,7 @@ class AttributeValueColorSerializer implements SerializerInterface{
 	use StatelessForkable;
 
 	public function read(ByteBufferReader $in, CodecType $codec) : AttributeValueColor{
-		$type = AttributeValueColorType::tryFrom(VarInt::readUnsignedInt($in));
+		$type = AttributeValueColorType::fromWireId(VarInt::readUnsignedInt($in));
 
 		$value = match($type){
 			AttributeValueColorType::HEX => $codec->read(AttributeValueColorString::class, $in),
@@ -39,7 +39,7 @@ class AttributeValueColorSerializer implements SerializerInterface{
     public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
         assert($data instanceof AttributeValueColor);
 
-        VarInt::writeUnsignedInt($out, $data->value->type->value);
+        VarInt::writeUnsignedInt($out, $data->value->type->toWireId());
         match(true){
             $data->value instanceof AttributeValueColorString => $codec->write(AttributeValueColorString::class, $out, $data->value),
             $data->value instanceof AttributeValueColorArray => $codec->write(AttributeValueColorArray::class, $out, $data->value),

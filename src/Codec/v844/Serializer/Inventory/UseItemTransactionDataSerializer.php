@@ -11,6 +11,7 @@ use Nicholass003\Axiom\Codec\Support\StatelessForkable;
 use Nicholass003\Axiom\Data\Type\Inventory\NetworkInventoryAction;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
+use Nicholass003\Axiom\Enum\HandSlot;
 use Nicholass003\Axiom\Enum\PredictedResult;
 use Nicholass003\Axiom\Enum\TriggerType;
 use pmmp\encoding\Byte;
@@ -50,6 +51,7 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 			$blockPosition,
 			$face,
 			$hotbarSlot,
+			HandSlot::MAINHAND,
 			$itemInHand,
 			$playerPosition,
 			$clickPosition,
@@ -61,6 +63,7 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
 		assert($data instanceof UseItemTransactionData);
 
+		CodecHelper::writeList($out, $data->actions, fn($out, $a) => $codec->write(NetworkInventoryAction::class, $out, $a));
 		VarInt::writeUnsignedInt($out, $data->actionType);
 		Byte::writeUnsigned($out, $data->triggerType->value);
 		CodecHelper::writeBlockPosition($out, $data->blockPosition);

@@ -11,8 +11,10 @@ use Nicholass003\Axiom\Codec\Support\StatelessForkable;
 use Nicholass003\Axiom\Data\Type\Inventory\NetworkInventoryAction;
 use Nicholass003\Axiom\Data\Type\ItemStackWrapper;
 use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
+use Nicholass003\Axiom\Enum\HandSlot;
 use Nicholass003\Axiom\Enum\PredictedResult;
 use Nicholass003\Axiom\Enum\TriggerType;
+use pmmp\encoding\Byte;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
 use pmmp\encoding\VarInt;
@@ -36,11 +38,12 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 		$playerPosition = CodecHelper::readVec3($in);
 		$clickPosition = CodecHelper::readVec3($in);
 		$blockRuntimeId = VarInt::readUnsignedInt($in);
-		$predictedRaw = VarInt::readUnsignedInt($in);
+		$predictedRaw = Byte::readUnsigned($in);
 		$predictedResult = PredictedResult::safe($predictedRaw);
 		if($predictedResult === PredictedResult::UNKNOWN){
 			throw new \RuntimeException("Invalid predicted result $predictedRaw");
 		}
+		$clientCooldownState = Byte::readUnsigned($in);
 
 		return new UseItemTransactionData(
 			$actions,
@@ -49,17 +52,20 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 			$blockPosition,
 			$face,
 			$hotbarSlot,
+			HandSlot::MAINHAND,
 			$itemInHand,
 			$playerPosition,
 			$clickPosition,
 			$blockRuntimeId,
-			$predictedResult
+			$predictedResult,
+			$clientCooldownState
 		);
 	}
 
 	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{
 		assert($data instanceof UseItemTransactionData);
 
+		CodecHelper::writeList($out, $data->actions, fn($out, $a) => $codec->write(NetworkInventoryAction::class, $out, $a));
 		VarInt::writeUnsignedInt($out, $data->actionType);
 		VarInt::writeUnsignedInt($out, $data->triggerType->value);
 		CodecHelper::writeSignedBlockPosition($out, $data->blockPosition);
@@ -69,6 +75,7 @@ class UseItemTransactionDataSerializer implements SerializerInterface{
 		CodecHelper::writeVec3($out, $data->playerPosition);
 		CodecHelper::writeVec3($out, $data->clickPosition);
 		VarInt::writeUnsignedInt($out, $data->blockRuntimeId);
-		VarInt::writeUnsignedInt($out, $data->clientInteractPrediction->value);
+		Byte::writeUnsigned($out, $data->clientInteractPrediction->value);
+		Byte::writeUnsigned($out, $data->clientCooldownState);
 	}
 }

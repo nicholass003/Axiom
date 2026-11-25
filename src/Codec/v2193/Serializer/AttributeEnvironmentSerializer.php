@@ -28,7 +28,7 @@ class AttributeEnvironmentSerializer implements SerializerInterface{
 		$name = CodecHelper::readString($in);
 
 		$fromAttribute = CodecHelper::readOptional($in, function(ByteBufferReader $in) use ($codec) : AttributeValue {
-			$type = AttributeValueType::tryFrom(VarInt::readUnsignedInt($in));
+			$type = AttributeValueType::fromWireId(VarInt::readUnsignedInt($in));
 			return match($type){
 				AttributeValueType::BOOL => $codec->read(AttributeValueBool::class, $in),
 				AttributeValueType::FLOAT => $codec->read(AttributeValueFloat::class, $in),
@@ -37,7 +37,7 @@ class AttributeEnvironmentSerializer implements SerializerInterface{
 			};
 		});
 
-		$attributeType = AttributeValueType::tryFrom(VarInt::readUnsignedInt($in));
+		$attributeType = AttributeValueType::fromWireId(VarInt::readUnsignedInt($in));
 		$attribute = match($attributeType){
 			AttributeValueType::BOOL => $codec->read(AttributeValueBool::class, $in),
 			AttributeValueType::FLOAT => $codec->read(AttributeValueFloat::class, $in),
@@ -46,7 +46,7 @@ class AttributeEnvironmentSerializer implements SerializerInterface{
 		};
 
 		$toAttribute = CodecHelper::readOptional($in, function(ByteBufferReader $in) use ($codec) : AttributeValue {
-			$type = AttributeValueType::tryFrom(VarInt::readUnsignedInt($in));
+			$type = AttributeValueType::fromWireId(VarInt::readUnsignedInt($in));
 			return match($type){
 				AttributeValueType::BOOL => $codec->read(AttributeValueBool::class, $in),
 				AttributeValueType::FLOAT => $codec->read(AttributeValueFloat::class, $in),
@@ -82,7 +82,7 @@ class AttributeEnvironmentSerializer implements SerializerInterface{
 		CodecHelper::writeString($out, $data->name);
 
 		CodecHelper::writeOptional($out, $data->fromAttribute, function(ByteBufferWriter $out, AttributeValue $value) use ($codec) {
-			VarInt::writeUnsignedInt($out, $value->type->value);
+			VarInt::writeUnsignedInt($out, $value->type->toWireId());
 			match(true){
 				$value instanceof AttributeValueBool => $codec->write(AttributeValueBool::class, $out, $value),
 				$value instanceof AttributeValueFloat => $codec->write(AttributeValueFloat::class, $out, $value),
@@ -91,7 +91,7 @@ class AttributeEnvironmentSerializer implements SerializerInterface{
 			};
 		});
 
-		VarInt::writeUnsignedInt($out, $data->attribute->type->value);
+		VarInt::writeUnsignedInt($out, $data->attribute->type->toWireId());
 		match(true){
 			$data->attribute instanceof AttributeValueBool => $codec->write(AttributeValueBool::class, $out, $data->attribute),
 			$data->attribute instanceof AttributeValueFloat => $codec->write(AttributeValueFloat::class, $out, $data->attribute),
@@ -100,7 +100,7 @@ class AttributeEnvironmentSerializer implements SerializerInterface{
 		};
 
 		CodecHelper::writeOptional($out, $data->toAttribute, function(ByteBufferWriter $out, AttributeValue $value) use ($codec) {
-			VarInt::writeUnsignedInt($out, $value->type->value);
+			VarInt::writeUnsignedInt($out, $value->type->toWireId());
 			match(true){
 				$value instanceof AttributeValueBool => $codec->write(AttributeValueBool::class, $out, $value),
 				$value instanceof AttributeValueFloat => $codec->write(AttributeValueFloat::class, $out, $value),

@@ -21,8 +21,9 @@ class UpdateSubChunkBlocksPacketEntrySerializer implements SerializerInterface{
             blockPosition: CodecHelper::readSignedBlockPosition($in),
             blockRuntimeId: VarInt::readUnsignedInt($in),
             flags: VarInt::readUnsignedInt($in),
-            syncedUpdateType: VarInt::readUnsignedInt($in),
-            actorUniqueId: CodecHelper::readActorUniqueId($in)
+            //note: the synced update actor unique ID is unsigned here, unlike the usual signed actor unique ID
+            actorUniqueId: VarInt::readUnsignedLong($in),
+            syncedUpdateType: VarInt::readUnsignedInt($in)
         );
     }
 
@@ -32,7 +33,7 @@ class UpdateSubChunkBlocksPacketEntrySerializer implements SerializerInterface{
         CodecHelper::writeSignedBlockPosition($out, $data->blockPosition);
         VarInt::writeUnsignedInt($out, $data->blockRuntimeId);
         VarInt::writeUnsignedInt($out, $data->flags);
+        VarInt::writeUnsignedLong($out, $data->actorUniqueId);
         VarInt::writeUnsignedInt($out, $data->syncedUpdateType);
-        CodecHelper::writeActorUniqueId($out, $data->actorUniqueId);
     }
 }

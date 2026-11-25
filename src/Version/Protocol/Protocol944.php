@@ -21,6 +21,7 @@ use Nicholass003\Axiom\Codec\v944\LocatorBarCodec;
 use Nicholass003\Axiom\Codec\v944\OpenSignCodec;
 use Nicholass003\Axiom\Codec\v944\PartyChangedCodec;
 use Nicholass003\Axiom\Codec\v944\PlayerActionCodec;
+use Nicholass003\Axiom\Codec\v944\PlaySoundCodec;
 use Nicholass003\Axiom\Codec\v944\ResourcePacksReadyForValidationCodec;
 use Nicholass003\Axiom\Codec\v944\Serializer\Attribute\AttributeEnvironmentSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Attribute\AttributeLayerSerializer;
@@ -40,7 +41,10 @@ use Nicholass003\Axiom\Codec\v944\Serializer\Camera\CameraFovInstructionSerializ
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\CameraProgressOptionSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\CameraRotationOptionSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\CameraSplineInstructionSerializer;
+use Nicholass003\Axiom\Codec\v944\Serializer\Inventory\UseItemTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\LevelSettingsDataSerializer;
+use Nicholass003\Axiom\Codec\v944\Serializer\Map\MapTrackedObjectSerializer;
+use Nicholass003\Axiom\Codec\v944\Serializer\Structure\StructureSettingsSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\SubChunk\UpdateSubChunkBlocksPacketEntrySerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\SyncWorldClock\SyncWorldClockDataSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\SyncWorldClock\SyncWorldClockMarkerDataSerializer;
@@ -79,8 +83,11 @@ use Nicholass003\Axiom\Data\Type\Camera\CameraFovInstruction;
 use Nicholass003\Axiom\Data\Type\Camera\CameraProgressOption;
 use Nicholass003\Axiom\Data\Type\Camera\CameraRotationOption;
 use Nicholass003\Axiom\Data\Type\Camera\CameraSplineInstruction;
+use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
 use Nicholass003\Axiom\Data\Type\LevelSettingsData;
+use Nicholass003\Axiom\Data\Type\Map\MapTrackedObject;
 use Nicholass003\Axiom\Data\Type\SerializableVoxelShape;
+use Nicholass003\Axiom\Data\Type\Structure\StructureSettings;
 use Nicholass003\Axiom\Data\Type\SubChunk\UpdateSubChunkBlocksPacketEntry;
 use Nicholass003\Axiom\Data\Type\SyncWorldClockData;
 use Nicholass003\Axiom\Data\Type\SyncWorldClockMarkerData;
@@ -105,6 +112,7 @@ use Nicholass003\Axiom\Packet\LocatorBarPacket;
 use Nicholass003\Axiom\Packet\OpenSignPacket;
 use Nicholass003\Axiom\Packet\PartyChangedPacket;
 use Nicholass003\Axiom\Packet\PlayerActionPacket;
+use Nicholass003\Axiom\Packet\PlaySoundPacket;
 use Nicholass003\Axiom\Packet\ResourcePacksReadyForValidationPacket;
 use Nicholass003\Axiom\Packet\ServerboundDataDrivenScreenClosedPacket;
 use Nicholass003\Axiom\Packet\SetSpawnPositionPacket;
@@ -130,6 +138,9 @@ class Protocol944 implements ProtocolInterface{
         $codec->override(CameraSplineInstruction::class, new CameraSplineInstructionSerializer());
         $codec->override(LevelSettingsData::class, new LevelSettingsDataSerializer());
         $codec->override(UpdateSubChunkBlocksPacketEntry::class, new UpdateSubChunkBlocksPacketEntrySerializer());
+        $codec->override(MapTrackedObject::class, new MapTrackedObjectSerializer());
+        $codec->override(StructureSettings::class, new StructureSettingsSerializer());
+        $codec->override(UseItemTransactionData::class, new UseItemTransactionDataSerializer());
         $codec->register(WorldPosition::class, new WorldPositionSerializer());
         $codec->register(SyncWorldClockData::class, new SyncWorldClockDataSerializer());
         $codec->register(SyncWorldClockMarkerData::class, new SyncWorldClockMarkerDataSerializer());
@@ -183,6 +194,7 @@ class Protocol944 implements ProtocolInterface{
             ->override(GraphicsOverrideParameterPacket::ID, new GraphicsOverrideParameterCodec())
             ->override(ClientboundDataDrivenUIShowScreenPacket::ID, new ClientboundDataDrivenUIShowScreenCodec())
             ->override(ClientboundDataDrivenUICloseScreenPacket::ID, new ClientboundDataDrivenUICloseScreenCodec())
+            ->override(PlaySoundPacket::ID, new PlaySoundCodec())
             ->override(VoxelShapesPacket::ID, new VoxelShapesCodec());
     }
 }
