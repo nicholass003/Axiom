@@ -103,6 +103,7 @@ use Nicholass003\Axiom\Data\Type\WhiskerScopeDataSummary;
 use Nicholass003\Axiom\Packet\AddActorPacket;
 use Nicholass003\Axiom\Packet\AnvilDamagePacket;
 use Nicholass003\Axiom\Packet\ClientboundUpdateSoundDataPacket;
+use Nicholass003\Axiom\Packet\CraftingDataPacket;
 use Nicholass003\Axiom\Packet\GameRulesChangedPacket;
 use Nicholass003\Axiom\Packet\InventoryContentPacket;
 use Nicholass003\Axiom\Packet\InventorySlotPacket;
@@ -125,7 +126,6 @@ use Nicholass003\Axiom\Packet\StartGamePacket;
 use Nicholass003\Axiom\Packet\TransferPacket;
 use Nicholass003\Axiom\Version\MinecraftVersionNetwork;
 use Nicholass003\Axiom\Version\ProtocolVersion;
-use Nicholass003\Axiom\Packet\CraftingDataPacket;
 
 class Protocol2168 implements ProtocolInterface{
 
@@ -171,7 +171,7 @@ class Protocol2168 implements ProtocolInterface{
 
     public static function build(?MinecraftVersionNetwork $mc = null) : CodecBuilder{
         if($mc && $mc->isAtLeast("1.26.44")){
-            return Protocol2168_h4::build($mc);
+            return Protocol2168_h4::build();
         }
 
         return Protocol1001::build($mc)->fork(ProtocolVersion::v2168, $mc?->__toString() ?? "1.26.40")
