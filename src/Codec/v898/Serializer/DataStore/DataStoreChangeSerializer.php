@@ -15,7 +15,6 @@ use Nicholass003\Axiom\Data\Type\DataStore\StringDataStoreValue;
 use Nicholass003\Axiom\Enum\DataStoreValueType;
 use pmmp\encoding\ByteBufferReader;
 use pmmp\encoding\ByteBufferWriter;
-use pmmp\encoding\LE;
 use pmmp\encoding\VarInt;
 
 class DataStoreChangeSerializer implements SerializerInterface{
