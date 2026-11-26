@@ -359,7 +359,7 @@ class CodecHelper{
         $currentShift = 0;
 
         for($i = 0; $i < $length; $i += self::SHIFT){
-            $bits = $parts[$currentIndex] >> $currentShift;
+            $bits = ($parts[$currentIndex] ?? 0) >> $currentShift;
             $nextShift = $currentShift + self::SHIFT;
             if($nextShift >= self::INT_BITS){
                 $nextShift -= self::INT_BITS;

@@ -72,6 +72,8 @@ enum ActorEventType : int{
     case SHAKE_WETNESS_STOP = 79;
     /** @since v898 */
     case KINETIC_DAMAGE_DEALT = 80;
+    /** @since v975 */
+    case HURT_WITHOUT_RECEIVING_DAMAGE = 81;
 
     public static function safe(int $value) : self{
         return self::tryFrom($value) ?? self::UNKNOWN;

@@ -138,6 +138,14 @@ enum EntityMetadataFlag : int{
 	case CAN_USE_VERTICAL_MOVEMENT_ACTION = 125;
 	/** @since v898 */
 	case ROTATION_LOCKED_TO_VEHICLE = 126;
+	/** @since v975 */
+	case USES_LEGACY_FRICTION = 127;
+	/** @since v2168 */
+	case USES_UNIFORM_AIR_DRAG = 128;
+	/** @since v2168 */
+	case NAMEPLATE_DEPTH_TESTED = 129;
+	/** @since v2168 */
+	case NOT_PICKABLE_FROM_INSIDE = 130;
 
-	case NUMBER_OF_FLAGS = 127;
+	case NUMBER_OF_FLAGS = 131;
 }

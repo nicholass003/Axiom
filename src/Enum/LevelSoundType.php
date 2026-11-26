@@ -576,6 +576,10 @@ enum LevelSoundType : int{
 	case ITEM_NETHERITE_SPEAR_USE = 596;
 	case PAUSE_GROWTH = 597;
 	case RESET_GROWTH = 598;
+    /** @since v975 */
+	case PUSHED_BY_PLAYER = 599;
+    /** @since v975 */
+	case BOUNCE = 600;
 
     /** @since v1001 */
 	case SLIME_LANDING = 601;

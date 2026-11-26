@@ -34,7 +34,7 @@ class ItemStackWrapperSerializer implements SerializerInterface{
 
 		$blockRuntimeId = VarInt::readUnsignedInt($in);
 		$rawExtraData = CodecHelper::readString($in);
-        return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData), $variant);
+		return new ItemStackWrapper($stackId, new ItemStack($id, $meta, $count, $blockRuntimeId, $rawExtraData), $variant);
 	}
 
 	public function write(ByteBufferWriter $out, mixed $data, CodecType $codec) : void{

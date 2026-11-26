@@ -18,7 +18,7 @@ class ClientMovementPredictionSyncCodec implements Codec{
 
     public function decode(ByteBufferReader $in, CodecType $codec) : ClientMovementPredictionSyncPacket{
         $pk = new ClientMovementPredictionSyncPacket();
-        $pk->flags = CodecHelper::readBitSet($in, EntityMetadataFlag::ROTATION_LOCKED_TO_VEHICLE->value);
+        $pk->flags = CodecHelper::readBitSet($in, EntityMetadataFlag::USES_UNIFORM_AIR_DRAG->value);
         $pk->scale = LE::readFloat($in);
         $pk->width = LE::readFloat($in);
         $pk->height = LE::readFloat($in);

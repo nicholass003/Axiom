@@ -8,6 +8,7 @@ use Nicholass003\Axiom\Codec\CodecBuilder;
 use Nicholass003\Axiom\Codec\CodecType;
 use Nicholass003\Axiom\Codec\v898\AnimateCodec;
 use Nicholass003\Axiom\Codec\v898\AvailableCommandsCodec;
+use Nicholass003\Axiom\Codec\v898\ClientMovementPredictionSyncCodec;
 use Nicholass003\Axiom\Codec\v898\ClientboundDataStoreCodec;
 use Nicholass003\Axiom\Codec\v898\ClientboundDebugRendererCodec;
 use Nicholass003\Axiom\Codec\v898\CommandOutputCodec;
@@ -53,6 +54,7 @@ use Nicholass003\Axiom\Data\Type\Debug\DebugMarkerData;
 use Nicholass003\Axiom\Packet\AnimatePacket;
 use Nicholass003\Axiom\Packet\AvailableCommandsPacket;
 use Nicholass003\Axiom\Packet\ClientboundDataStorePacket;
+use Nicholass003\Axiom\Packet\ClientMovementPredictionSyncPacket;
 use Nicholass003\Axiom\Packet\ClientboundDebugRendererPacket;
 use Nicholass003\Axiom\Packet\CommandOutputPacket;
 use Nicholass003\Axiom\Packet\CommandRequestPacket;
@@ -102,6 +104,7 @@ class Protocol898 implements ProtocolInterface{
             ->override(CommandOutputPacket::ID, new CommandOutputCodec())
             ->override(CommandRequestPacket::ID, new CommandRequestCodec())
             ->override(ClientboundDebugRendererPacket::ID, new ClientboundDebugRendererCodec())
-            ->override(ClientboundDataStorePacket::ID, new ClientboundDataStoreCodec());
+            ->override(ClientboundDataStorePacket::ID, new ClientboundDataStoreCodec())
+            ->override(ClientMovementPredictionSyncPacket::ID, new ClientMovementPredictionSyncCodec());
     }
 }

@@ -43,6 +43,8 @@ use Nicholass003\Axiom\Codec\v944\Serializer\Camera\CameraRotationOptionSerializ
 use Nicholass003\Axiom\Codec\v944\Serializer\Camera\CameraSplineInstructionSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Inventory\UseItemTransactionDataSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\LevelSettingsDataSerializer;
+use Nicholass003\Axiom\Codec\v944\Serializer\LocatorBarWaypointPayloadSerializer;
+use Nicholass003\Axiom\Codec\v944\Serializer\LocatorBarWaypointSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Map\MapTrackedObjectSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\Structure\StructureSettingsSerializer;
 use Nicholass003\Axiom\Codec\v944\Serializer\SubChunk\UpdateSubChunkBlocksPacketEntrySerializer;
@@ -85,6 +87,8 @@ use Nicholass003\Axiom\Data\Type\Camera\CameraRotationOption;
 use Nicholass003\Axiom\Data\Type\Camera\CameraSplineInstruction;
 use Nicholass003\Axiom\Data\Type\Inventory\UseItemTransactionData;
 use Nicholass003\Axiom\Data\Type\LevelSettingsData;
+use Nicholass003\Axiom\Data\Type\LocatorBarWaypoint;
+use Nicholass003\Axiom\Data\Type\LocatorBarWaypointPayload;
 use Nicholass003\Axiom\Data\Type\Map\MapTrackedObject;
 use Nicholass003\Axiom\Data\Type\SerializableVoxelShape;
 use Nicholass003\Axiom\Data\Type\Structure\StructureSettings;
@@ -163,6 +167,8 @@ class Protocol944 implements ProtocolInterface{
         $codec->register(AttributeValueFloat::class, new AttributeValueFloatSerializer());
         $codec->register(AttributesRemoveEnvironment::class, new AttributesRemoveEnvironmentSerializer());
         $codec->register(AttributesUpdateEnvironment::class, new AttributesUpdateEnvironmentSerializer());
+        $codec->register(LocatorBarWaypoint::class, new LocatorBarWaypointSerializer());
+        $codec->register(LocatorBarWaypointPayload::class, new LocatorBarWaypointPayloadSerializer());
         return $codec;
     }
 

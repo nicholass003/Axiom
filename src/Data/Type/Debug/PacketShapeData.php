@@ -16,8 +16,20 @@ class PacketShapeData{
         public readonly ?float $scale,
         public readonly ?Vec3 $rotation,
         public readonly ?float $totalTimeLeft,
+        /** @since v975 */
+        public readonly ?float $maximumRenderDistance,
         public readonly ?int $colorArgb,
         public readonly ?string $text,
+        /** @since v975 */
+        public readonly ?bool $useRotation,
+        /** @since v975 */
+        public readonly ?int $backgroundColorArgb,
+        /** @since v975 */
+        public readonly ?bool $depthTest,
+        /** @since v975 */
+        public readonly ?bool $showBackface,
+        /** @since v975 */
+        public readonly ?bool $showTextBackface,
         public readonly ?Vec3 $boxBound,
         public readonly ?Vec3 $lineEndLocation,
         public readonly ?float $arrowHeadLength,
